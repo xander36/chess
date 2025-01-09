@@ -54,117 +54,148 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        List<ChessMove> moves = new ArrayList<>();
 
+        switch (type){
+            case ROOK:
+                return rookMoves(board, myPosition);
+            case KNIGHT:
+                return knightMoves(board, myPosition);
+
+            case BISHOP:
+                return bishopMoves(board, myPosition);
+            case QUEEN:
+
+                break;
+
+        }
+        return null;
+    }
+
+    private Collection<ChessMove> rookMoves(ChessBoard board, ChessPosition myPosition){
+        List<ChessMove> moves = new ArrayList<>();
 
         int row = myPosition.getRow();
         int col = myPosition.getColumn();
 
-        switch (type){
-            case ROOK:
-                for (int i = row; i > 0; i--){
-                    ChessPosition checkPosition = new ChessPosition(i, col);
-                    moves.add(new ChessMove(myPosition, checkPosition, null));
-                    if (board.getPiece(checkPosition) != null){
-                        break;
-                    }
-                }
-                for (int i = row; i < 9; i++){
-                    ChessPosition checkPosition = new ChessPosition(i, col);
-                    moves.add(new ChessMove(myPosition, checkPosition, null));
-                    if (board.getPiece(checkPosition) != null){
-                        break;
-                    }
-                }
-
-                for (int i = col; i > 0; i--){
-                    ChessPosition checkPosition = new ChessPosition(row, i);
-                    moves.add(new ChessMove(myPosition, checkPosition, null));
-                    if (board.getPiece(checkPosition) != null){
-                        break;
-                    }
-                }
-                for (int i = col; i < 9; i++){
-                    ChessPosition checkPosition = new ChessPosition(row, i);
-                    moves.add(new ChessMove(myPosition, checkPosition, null));
-                    if (board.getPiece(checkPosition) != null){
-                        break;
-                    }
-                }
+        for (int i = row; i > 0; i--){
+            ChessPosition checkPosition = new ChessPosition(i, col);
+            moves.add(new ChessMove(myPosition, checkPosition, null));
+            if (board.getPiece(checkPosition) != null){
                 break;
-
-            case KNIGHT:
-                List <ChessPosition> positions = new ArrayList<>();
-
-                positions.add(new ChessPosition(row+1, col+2));
-                positions.add(new ChessPosition(row+1, col-2));
-                positions.add(new ChessPosition(row-2, col+1));
-                positions.add(new ChessPosition(row-2, col-1));
-                positions.add(new ChessPosition(row-1, col+2));
-                positions.add(new ChessPosition(row-1, col-2));
-                positions.add(new ChessPosition(row+2, col+1));
-                positions.add(new ChessPosition(row+2, col-1));
-
-                for (ChessPosition position : positions) {
-                    if (position.getRow() > 0 && position.getRow() < 9 && position.getColumn() > 0 && position.getColumn() < 9) {
-                        moves.add(new ChessMove(myPosition, position, null));
-                    }
-                }
-
+            }
+        }
+        for (int i = row; i < 9; i++){
+            ChessPosition checkPosition = new ChessPosition(i, col);
+            moves.add(new ChessMove(myPosition, checkPosition, null));
+            if (board.getPiece(checkPosition) != null){
                 break;
+            }
+        }
 
-            case BISHOP:
-                int testRow = row;
-                int testCol = col;
-
-                while(validPosInt(testRow) && validPosInt(testCol)) {
-                    testRow += 1;
-                    testCol += 1;
-                    ChessPosition testPosition = new ChessPosition(testRow, testCol);
-                    moves.add(new ChessMove(myPosition, testPosition, null));
-                    if (board.getPiece(testPosition) != null) {
-                        break;
-                    }
-                }
-
-                while(validPosInt(testRow) && validPosInt(testCol)) {
-                    testRow += 1;
-                    testCol -= 1;
-                    ChessPosition testPosition = new ChessPosition(testRow, testCol);
-                    moves.add(new ChessMove(myPosition, testPosition, null));
-                    if (board.getPiece(testPosition) != null) {
-                        break;
-                    }
-                }
-
-                while(validPosInt(testRow) && validPosInt(testCol)) {
-                    testRow -= 1;
-                    testCol -= 1;
-                    ChessPosition testPosition = new ChessPosition(testRow, testCol);
-                    moves.add(new ChessMove(myPosition, testPosition, null));
-                    if (board.getPiece(testPosition) != null) {
-                        break;
-                    }
-                }
-
-                while(validPosInt(testRow) && validPosInt(testCol)) {
-                    testRow -= 1;
-                    testCol += 1;
-                    ChessPosition testPosition = new ChessPosition(testRow, testCol);
-                    moves.add(new ChessMove(myPosition, testPosition, null));
-                    if (board.getPiece(testPosition) != null) {
-                        break;
-                    }
-                }
-
+        for (int i = col; i > 0; i--){
+            ChessPosition checkPosition = new ChessPosition(row, i);
+            moves.add(new ChessMove(myPosition, checkPosition, null));
+            if (board.getPiece(checkPosition) != null){
                 break;
-
+            }
+        }
+        for (int i = col; i < 9; i++){
+            ChessPosition checkPosition = new ChessPosition(row, i);
+            moves.add(new ChessMove(myPosition, checkPosition, null));
+            if (board.getPiece(checkPosition) != null){
+                break;
+            }
         }
 
         return moves;
     }
 
-    @Override
+    private Collection<ChessMove> knightMoves(ChessBoard board, ChessPosition myPosition){
+        List<ChessMove> moves = new ArrayList<>();
+
+        int row = myPosition.getRow();
+        int col = myPosition.getColumn();
+
+        List <ChessPosition> positions = new ArrayList<>();
+
+        positions.add(new ChessPosition(row+1, col+2));
+        positions.add(new ChessPosition(row+1, col-2));
+        positions.add(new ChessPosition(row-2, col+1));
+        positions.add(new ChessPosition(row-2, col-1));
+        positions.add(new ChessPosition(row-1, col+2));
+        positions.add(new ChessPosition(row-1, col-2));
+        positions.add(new ChessPosition(row+2, col+1));
+        positions.add(new ChessPosition(row+2, col-1));
+
+        for (ChessPosition position : positions) {
+            if (position.getRow() > 0 && position.getRow() < 9 && position.getColumn() > 0 && position.getColumn() < 9) {
+                moves.add(new ChessMove(myPosition, position, null));
+            }
+        }
+
+        return moves;
+    }
+
+    private Collection<ChessMove> bishopMoves(ChessBoard board, ChessPosition myPosition){
+        List<ChessMove> moves = new ArrayList<>();
+
+        int row = myPosition.getRow();
+        int col = myPosition.getColumn();
+
+
+        int testRow = row;
+        int testCol = col;
+
+        while(validPosInt(testRow) && validPosInt(testCol)) {
+            testRow += 1;
+            testCol += 1;
+            ChessPosition testPosition = new ChessPosition(testRow, testCol);
+            moves.add(new ChessMove(myPosition, testPosition, null));
+            if (board.getPiece(testPosition) != null) {
+                break;
+            }
+        }
+
+        testRow = row;
+        testCol = col;
+        while(validPosInt(testRow) && validPosInt(testCol)) {
+            testRow += 1;
+            testCol -= 1;
+            ChessPosition testPosition = new ChessPosition(testRow, testCol);
+            moves.add(new ChessMove(myPosition, testPosition, null));
+            if (board.getPiece(testPosition) != null) {
+                break;
+            }
+        }
+
+        testRow = row;
+        testCol = col;
+        while(validPosInt(testRow) && validPosInt(testCol)) {
+            testRow -= 1;
+            testCol -= 1;
+            ChessPosition testPosition = new ChessPosition(testRow, testCol);
+            moves.add(new ChessMove(myPosition, testPosition, null));
+            if (board.getPiece(testPosition) != null) {
+                break;
+            }
+        }
+
+        testRow = row;
+        testCol = col;
+        while(validPosInt(testRow) && validPosInt(testCol)) {
+            testRow -= 1;
+            testCol += 1;
+            ChessPosition testPosition = new ChessPosition(testRow, testCol);
+            moves.add(new ChessMove(myPosition, testPosition, null));
+            if (board.getPiece(testPosition) != null) {
+                break;
+            }
+        }
+
+        return moves;
+    }
+
+        @Override
     public String toString() {
         String out;
         if (color == ChessGame.TeamColor.WHITE) {
