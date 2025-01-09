@@ -143,53 +143,55 @@ public class ChessPiece {
         int col = myPosition.getColumn();
 
 
-        int testRow = row;
-        int testCol = col;
+        int testRow = row+1;
+        int testCol = col+1;
 
         while(validPosInt(testRow) && validPosInt(testCol)) {
+            ChessPosition testPosition = new ChessPosition(testRow, testCol);
+            moves.add(new ChessMove(myPosition, testPosition, null));
+            if (board.getPiece(testPosition) != null) {
+                break;
+            }
             testRow += 1;
             testCol += 1;
+        }
+
+        testRow = row+1;
+        testCol = col-1;
+        while(validPosInt(testRow) && validPosInt(testCol)) {
             ChessPosition testPosition = new ChessPosition(testRow, testCol);
             moves.add(new ChessMove(myPosition, testPosition, null));
             if (board.getPiece(testPosition) != null) {
                 break;
             }
-        }
-
-        testRow = row;
-        testCol = col;
-        while(validPosInt(testRow) && validPosInt(testCol)) {
             testRow += 1;
             testCol -= 1;
+        }
+
+        testRow = row-1;
+        testCol = col-1;
+        while(validPosInt(testRow) && validPosInt(testCol)) {
             ChessPosition testPosition = new ChessPosition(testRow, testCol);
             moves.add(new ChessMove(myPosition, testPosition, null));
+            System.out.println(testPosition.getRow());
+            System.out.println(testPosition.getColumn());
             if (board.getPiece(testPosition) != null) {
                 break;
             }
-        }
-
-        testRow = row;
-        testCol = col;
-        while(validPosInt(testRow) && validPosInt(testCol)) {
             testRow -= 1;
             testCol -= 1;
-            ChessPosition testPosition = new ChessPosition(testRow, testCol);
-            moves.add(new ChessMove(myPosition, testPosition, null));
-            if (board.getPiece(testPosition) != null) {
-                break;
-            }
         }
 
-        testRow = row;
-        testCol = col;
+        testRow = row-1;
+        testCol = col+1;
         while(validPosInt(testRow) && validPosInt(testCol)) {
-            testRow -= 1;
-            testCol += 1;
             ChessPosition testPosition = new ChessPosition(testRow, testCol);
             moves.add(new ChessMove(myPosition, testPosition, null));
             if (board.getPiece(testPosition) != null) {
                 break;
             }
+            testRow -= 1;
+            testCol += 1;
         }
 
         return moves;
