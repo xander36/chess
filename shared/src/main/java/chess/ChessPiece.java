@@ -1,6 +1,8 @@
 package chess;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Represents a single chess piece
@@ -52,13 +54,73 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        throw new RuntimeException("Not implemented");
+        List<ChessMove> moves = new ArrayList<>();
+
+
+        int row = myPosition.getRow();
+        int col = myPosition.getColumn();
+
+        switch (type){
+            case ROOK:
+                for (int i = row; i > 0; i--){
+                    ChessPosition checkPosition = new ChessPosition(i, col);
+                    moves.add(new ChessMove(myPosition, checkPosition, null));
+                    if (board.getPiece(checkPosition) != null){
+                        break;
+                    }
+                }
+                for (int i = row; i < 9; i++){
+                    ChessPosition checkPosition = new ChessPosition(i, col);
+                    moves.add(new ChessMove(myPosition, checkPosition, null));
+                    if (board.getPiece(checkPosition) != null){
+                        break;
+                    }
+                }
+
+                for (int i = col; i > 0; i--){
+                    ChessPosition checkPosition = new ChessPosition(row, i);
+                    moves.add(new ChessMove(myPosition, checkPosition, null));
+                    if (board.getPiece(checkPosition) != null){
+                        break;
+                    }
+                }
+                for (int i = col; i < 9; i++){
+                    ChessPosition checkPosition = new ChessPosition(row, i);
+                    moves.add(new ChessMove(myPosition, checkPosition, null));
+                    if (board.getPiece(checkPosition) != null){
+                        break;
+                    }
+                }
+
+                break;
+
+            case KNIGHT:
+                List <ChessPosition> positions = new ArrayList<>();
+
+                positions.add(new ChessPosition(row+1, col+2));
+                positions.add(new ChessPosition(row+1, col-2));
+                positions.add(new ChessPosition(row-2, col+1));
+                positions.add(new ChessPosition(row-2, col-1));
+                positions.add(new ChessPosition(row-1, col+2));
+                positions.add(new ChessPosition(row-1, col-2));
+                positions.add(new ChessPosition(row+2, col+1));
+                positions.add(new ChessPosition(row+2, col-1));
+
+                for (ChessPosition position : positions){
+                    if (position.getRow() > 0 && position.getRow() < 9 && position.getColumn() > 0 && position.getColumn() < 9) {
+                        moves.add(new ChessMove(myPosition, position, null));
+                    }
+                }
+
+
+        }
+
+        return moves;
     }
 
     @Override
     public String toString() {
-        String out = "";
-
+        String out;
         if (color == ChessGame.TeamColor.WHITE) {
             out = switch (type) {
                 case KING -> "K";
