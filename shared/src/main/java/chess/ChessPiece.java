@@ -91,7 +91,6 @@ public class ChessPiece {
                         break;
                     }
                 }
-
                 break;
 
             case KNIGHT:
@@ -106,12 +105,59 @@ public class ChessPiece {
                 positions.add(new ChessPosition(row+2, col+1));
                 positions.add(new ChessPosition(row+2, col-1));
 
-                for (ChessPosition position : positions){
+                for (ChessPosition position : positions) {
                     if (position.getRow() > 0 && position.getRow() < 9 && position.getColumn() > 0 && position.getColumn() < 9) {
                         moves.add(new ChessMove(myPosition, position, null));
                     }
                 }
 
+                break;
+
+            case BISHOP:
+                int testRow = row;
+                int testCol = col;
+
+                while(validPosInt(testRow) && validPosInt(testCol)) {
+                    testRow += 1;
+                    testCol += 1;
+                    ChessPosition testPosition = new ChessPosition(testRow, testCol);
+                    moves.add(new ChessMove(myPosition, testPosition, null));
+                    if (board.getPiece(testPosition) != null) {
+                        break;
+                    }
+                }
+
+                while(validPosInt(testRow) && validPosInt(testCol)) {
+                    testRow += 1;
+                    testCol -= 1;
+                    ChessPosition testPosition = new ChessPosition(testRow, testCol);
+                    moves.add(new ChessMove(myPosition, testPosition, null));
+                    if (board.getPiece(testPosition) != null) {
+                        break;
+                    }
+                }
+
+                while(validPosInt(testRow) && validPosInt(testCol)) {
+                    testRow -= 1;
+                    testCol -= 1;
+                    ChessPosition testPosition = new ChessPosition(testRow, testCol);
+                    moves.add(new ChessMove(myPosition, testPosition, null));
+                    if (board.getPiece(testPosition) != null) {
+                        break;
+                    }
+                }
+
+                while(validPosInt(testRow) && validPosInt(testCol)) {
+                    testRow -= 1;
+                    testCol += 1;
+                    ChessPosition testPosition = new ChessPosition(testRow, testCol);
+                    moves.add(new ChessMove(myPosition, testPosition, null));
+                    if (board.getPiece(testPosition) != null) {
+                        break;
+                    }
+                }
+
+                break;
 
         }
 
@@ -144,5 +190,9 @@ public class ChessPiece {
         }
 
         return out;
+    }
+
+    private static boolean validPosInt(int val){
+        return (val > 0 && val < 9);
     }
 }
