@@ -60,15 +60,26 @@ public class ChessPiece {
                 return rookMoves(board, myPosition);
             case KNIGHT:
                 return knightMoves(board, myPosition);
-
             case BISHOP:
                 return bishopMoves(board, myPosition);
             case QUEEN:
-
-                break;
-
+                List<ChessMove> moves = new ArrayList<>();
+                moves.addAll(rookMoves(board, myPosition));
+                moves.addAll(bishopMoves(board, myPosition));
+                return moves;
+            case KING:
+                return kingMoves(board, myPosition);
+            case PAWN:
+                return pawnMoves(board, myPosition);
         }
         return null;
+    }
+
+    private boolean isFriendAt(ChessBoard board, ChessPosition position){
+        if (!ChessBoard.isValidPos(position)){
+            return false;
+        }
+        return !board.isEmptyAt(position) && board.getPiece(position).getTeamColor() == getTeamColor();
     }
 
     private Collection<ChessMove> rookMoves(ChessBoard board, ChessPosition myPosition){
@@ -77,36 +88,43 @@ public class ChessPiece {
         int row = myPosition.getRow();
         int col = myPosition.getColumn();
 
-        for (int i = row; i > 0; i--){
+        for (int i = row-1; i > 0; i--){
             ChessPosition checkPosition = new ChessPosition(i, col);
-            moves.add(new ChessMove(myPosition, checkPosition, null));
-            if (board.getPiece(checkPosition) != null){
+            if(!isFriendAt(board, checkPosition)) {
+                moves.add(new ChessMove(myPosition, checkPosition, null));
+            }
+            if (!board.isEmptyAt(checkPosition)){
                 break;
             }
         }
-        for (int i = row; i < 9; i++){
+        for (int i = row+1; i < 9; i++){
             ChessPosition checkPosition = new ChessPosition(i, col);
-            moves.add(new ChessMove(myPosition, checkPosition, null));
-            if (board.getPiece(checkPosition) != null){
+            if(!isFriendAt(board, checkPosition)) {
+                moves.add(new ChessMove(myPosition, checkPosition, null));
+            }
+            if (!board.isEmptyAt(checkPosition)){
                 break;
             }
         }
 
-        for (int i = col; i > 0; i--){
+        for (int i = col-1; i > 0; i--){
             ChessPosition checkPosition = new ChessPosition(row, i);
-            moves.add(new ChessMove(myPosition, checkPosition, null));
-            if (board.getPiece(checkPosition) != null){
+            if(!isFriendAt(board, checkPosition)) {
+                moves.add(new ChessMove(myPosition, checkPosition, null));
+            }
+            if (!board.isEmptyAt(checkPosition)){
                 break;
             }
         }
-        for (int i = col; i < 9; i++){
+        for (int i = col+1; i < 9; i++){
             ChessPosition checkPosition = new ChessPosition(row, i);
-            moves.add(new ChessMove(myPosition, checkPosition, null));
-            if (board.getPiece(checkPosition) != null){
+            if(!isFriendAt(board, checkPosition)) {
+                moves.add(new ChessMove(myPosition, checkPosition, null));
+            }
+            if (!board.isEmptyAt(checkPosition)){
                 break;
             }
         }
-
         return moves;
     }
 
@@ -129,7 +147,9 @@ public class ChessPiece {
 
         for (ChessPosition position : positions) {
             if (position.getRow() > 0 && position.getRow() < 9 && position.getColumn() > 0 && position.getColumn() < 9) {
-                moves.add(new ChessMove(myPosition, position, null));
+                if(!isFriendAt(board, position)){
+                    moves.add(new ChessMove(myPosition, position, null));
+                }
             }
         }
 
@@ -146,10 +166,12 @@ public class ChessPiece {
         int testRow = row+1;
         int testCol = col+1;
 
-        while(validPosInt(testRow) && validPosInt(testCol)) {
+        while(ChessBoard.validPosInt(testRow) && ChessBoard.validPosInt(testCol)) {
             ChessPosition testPosition = new ChessPosition(testRow, testCol);
-            moves.add(new ChessMove(myPosition, testPosition, null));
-            if (board.getPiece(testPosition) != null) {
+            if(!isFriendAt(board, testPosition)) {
+                moves.add(new ChessMove(myPosition, testPosition, null));
+            }
+            if (!board.isEmptyAt(testPosition)){
                 break;
             }
             testRow += 1;
@@ -158,10 +180,12 @@ public class ChessPiece {
 
         testRow = row+1;
         testCol = col-1;
-        while(validPosInt(testRow) && validPosInt(testCol)) {
+        while(ChessBoard.validPosInt(testRow) && ChessBoard.validPosInt(testCol)) {
             ChessPosition testPosition = new ChessPosition(testRow, testCol);
-            moves.add(new ChessMove(myPosition, testPosition, null));
-            if (board.getPiece(testPosition) != null) {
+            if(!isFriendAt(board, testPosition)) {
+                moves.add(new ChessMove(myPosition, testPosition, null));
+            }
+            if (!board.isEmptyAt(testPosition)){
                 break;
             }
             testRow += 1;
@@ -170,12 +194,12 @@ public class ChessPiece {
 
         testRow = row-1;
         testCol = col-1;
-        while(validPosInt(testRow) && validPosInt(testCol)) {
+        while(ChessBoard.validPosInt(testRow) && ChessBoard.validPosInt(testCol)) {
             ChessPosition testPosition = new ChessPosition(testRow, testCol);
-            moves.add(new ChessMove(myPosition, testPosition, null));
-            System.out.println(testPosition.getRow());
-            System.out.println(testPosition.getColumn());
-            if (board.getPiece(testPosition) != null) {
+            if(!isFriendAt(board, testPosition)) {
+                moves.add(new ChessMove(myPosition, testPosition, null));
+            }
+            if (!board.isEmptyAt(testPosition)){
                 break;
             }
             testRow -= 1;
@@ -184,10 +208,12 @@ public class ChessPiece {
 
         testRow = row-1;
         testCol = col+1;
-        while(validPosInt(testRow) && validPosInt(testCol)) {
+        while(ChessBoard.validPosInt(testRow) && ChessBoard.validPosInt(testCol)) {
             ChessPosition testPosition = new ChessPosition(testRow, testCol);
-            moves.add(new ChessMove(myPosition, testPosition, null));
-            if (board.getPiece(testPosition) != null) {
+            if(!isFriendAt(board, testPosition)) {
+                moves.add(new ChessMove(myPosition, testPosition, null));
+            }
+            if (!board.isEmptyAt(testPosition)){
                 break;
             }
             testRow -= 1;
@@ -197,7 +223,97 @@ public class ChessPiece {
         return moves;
     }
 
-        @Override
+    private Collection<ChessMove> kingMoves(ChessBoard board, ChessPosition myPosition){
+        List<ChessMove> moves = new ArrayList<>();
+
+        int row = myPosition.getRow();
+        int col = myPosition.getColumn();
+
+        List <ChessPosition> positions = new ArrayList<>();
+
+        positions.add(new ChessPosition(row, col+1));
+        positions.add(new ChessPosition(row, col-1));
+        positions.add(new ChessPosition(row+1, col));
+        positions.add(new ChessPosition(row-1, col));
+        positions.add(new ChessPosition(row+1, col+1));
+        positions.add(new ChessPosition(row+1, col-1));
+        positions.add(new ChessPosition(row-1, col+1));
+        positions.add(new ChessPosition(row-1, col-1));
+
+        for (ChessPosition position : positions) {
+            if (position.getRow() > 0 && position.getRow() < 9 && position.getColumn() > 0 && position.getColumn() < 9) {
+                if (!isFriendAt(board, position)){
+                    moves.add(new ChessMove(myPosition, position, null));
+                }
+            }
+        }
+        return moves;
+    }
+
+    private Collection<ChessMove> pawnMoves(ChessBoard board, ChessPosition myPosition){
+        List<ChessMove> moves = new ArrayList<>();
+
+        int row = myPosition.getRow();
+        int col = myPosition.getColumn();
+
+        List <ChessPosition> positions = new ArrayList<>();
+        if (color == ChessGame.TeamColor.BLACK){
+            if (board.isEmptyAt(new ChessPosition(row-1, col))){
+                positions.add(new ChessPosition(row-1, col));
+                if (row == 7 && board.isEmptyAt(new ChessPosition(row-2, col))){
+                    positions.add(new ChessPosition(row-2, col));
+                }
+            }
+
+            ChessPosition testPosition = new ChessPosition(row-1, col-1);
+            if(!board.isEmptyAt(testPosition) && !isFriendAt(board, testPosition)){
+                positions.add(testPosition);
+            }
+            testPosition = new ChessPosition(row-1, col+1);
+            if(!board.isEmptyAt(testPosition) && !isFriendAt(board, testPosition)){
+                positions.add(testPosition);
+            }
+        }
+        else{
+            if (board.isEmptyAt(new ChessPosition(row+1, col))){
+                positions.add(new ChessPosition(row+1, col));
+                if (row == 2 && board.isEmptyAt(new ChessPosition(row+2, col))){
+                    positions.add(new ChessPosition(row+2, col));
+                }
+            }
+
+            ChessPosition testPosition = new ChessPosition(row+1, col-1);
+            if(!board.isEmptyAt(testPosition) && !isFriendAt(board, testPosition)){
+                positions.add(testPosition);
+            }
+            testPosition = new ChessPosition(row+1, col+1);
+            if(!board.isEmptyAt(testPosition) && !isFriendAt(board, testPosition)){
+                positions.add(testPosition);
+            }
+        }
+
+        for (ChessPosition pos : positions){
+            if (ChessBoard.validPosInt(pos.getRow()) && ChessBoard.validPosInt(pos.getColumn())) {
+                if ((getTeamColor() == ChessGame.TeamColor.WHITE && pos.getRow() == 8) ||
+                        (getTeamColor() == ChessGame.TeamColor.BLACK && pos.getRow() == 1)) {
+                    moves.add(new ChessMove(myPosition, pos, PieceType.QUEEN));
+                    moves.add(new ChessMove(myPosition, pos, PieceType.BISHOP));
+                    moves.add(new ChessMove(myPosition, pos, PieceType.ROOK));
+                    moves.add(new ChessMove(myPosition, pos, PieceType.KNIGHT));
+                } else {
+                    moves.add(new ChessMove(myPosition, pos, null));
+                }
+            }
+
+        }
+
+        System.out.println(board);
+        System.out.println(moves);
+
+        return moves;
+    }
+
+    @Override
     public String toString() {
         String out;
         if (color == ChessGame.TeamColor.WHITE) {
@@ -225,7 +341,5 @@ public class ChessPiece {
         return out;
     }
 
-    private static boolean validPosInt(int val){
-        return (val > 0 && val < 9);
-    }
+
 }

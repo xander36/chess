@@ -66,6 +66,22 @@ public class ChessBoard {
         }
     }
 
+    public boolean isEmptyAt(ChessPosition position){
+        if (!isValidPos(position)){
+            return false;
+        }
+        return this.getPiece(position) == null;
+    }
+
+    public static boolean isValidPos(ChessPosition position){
+        return validPosInt(position.getRow()) && validPosInt(position.getColumn());
+    }
+
+
+    public static boolean validPosInt(int val){
+        return (val > 0 && val < 9);
+    }
+
     @Override
     public String toString() {
         String out = "";
@@ -73,7 +89,7 @@ public class ChessBoard {
         for (ChessPiece[] row : contents){
             for (ChessPiece piece : row){
                 if (piece == null){
-                    out += " ";
+                    out += "*";
                 }
                 else{
                     out += piece.toString();
