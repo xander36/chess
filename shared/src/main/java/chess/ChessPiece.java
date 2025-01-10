@@ -241,7 +241,7 @@ public class ChessPiece {
         positions.add(new ChessPosition(row-1, col-1));
 
         for (ChessPosition position : positions) {
-            if (position.getRow() > 0 && position.getRow() < 9 && position.getColumn() > 0 && position.getColumn() < 9) {
+            if (ChessBoard.isValidPos(position)) {
                 if (!isFriendAt(board, position)){
                     moves.add(new ChessMove(myPosition, position, null));
                 }
@@ -306,9 +306,6 @@ public class ChessPiece {
             }
 
         }
-
-        System.out.println(board);
-        System.out.println(moves);
 
         return moves;
     }
