@@ -169,11 +169,11 @@ public class ChessGame {
                 if (testPiece == null){
                     continue;
                 }
-
-                if(testPiece.getPieceType() == ChessPiece.PieceType.KING || testPiece.getTeamColor() == teamColor){
-                    //I may be the problem, solution is below
-                    continue;
-                }
+//
+//                if(testPiece.getPieceType() == ChessPiece.PieceType.KING || testPiece.getTeamColor() == teamColor){
+//                    //I may be the problem, solution is below
+//                    continue;
+//                }
 
                 //Collection<ChessMove> moveset = validMoves(testPos);
                 Collection<ChessMove> moveset = testPiece.pieceMoves(board, testPos);
