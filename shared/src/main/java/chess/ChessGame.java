@@ -60,7 +60,7 @@ public class ChessGame {
 
         Collection<ChessMove> moves = piece.pieceMoves(board, startPosition);
 
-        //ChessBoard oldBoard = board.copy();
+        ChessBoard oldBoard = new ChessBoard(board);
 
         return moves;
     }
