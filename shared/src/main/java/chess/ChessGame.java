@@ -1,6 +1,8 @@
 package chess;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.ArrayList;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -11,9 +13,11 @@ import java.util.Collection;
 public class ChessGame {
 
     private TeamColor turn;
+    private ChessBoard board;
 
     public ChessGame() {
         this.turn = TeamColor.WHITE;
+        this.board = new ChessBoard();
     }
 
     /**
@@ -48,7 +52,42 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        throw new RuntimeException("Not implemented");
+        ChessPiece piece = board.getPiece(startPosition);
+
+        if (piece == null){
+            return null;
+        }
+
+        Collection<ChessMove> moves = piece.pieceMoves(board, startPosition);
+
+        //ChessBoard oldBoard = board.copy();
+
+        return moves;
+    }
+
+    public boolean hasValidMoves(TeamColor color){
+        ChessPosition testPos = null;
+        ChessPiece testPiece = null;
+        for (int i = 1; i < 9; i++){
+            for (int j = 1; j <9; j++) {
+                testPos = new ChessPosition(i,j);
+                testPiece = board.getPiece(testPos);
+
+                if(testPiece.getTeamColor() == color){
+                    //I may be the problem, solution is below
+                    continue;
+                }
+
+                Collection<ChessMove> moveset = validMoves(testPos);
+
+                if (!moveset.isEmpty()){
+
+                    return true;
+                }
+
+            }
+        }
+        return false;
     }
 
     /**
@@ -68,7 +107,41 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        ChessPosition kingPos = null;
+        for (int i = 1; i < 9; i++){
+            for (int j = 1; j <9; j++) {
+                kingPos = new ChessPosition(i, j);
+                if (board.getPiece(kingPos).getPieceType() == ChessPiece.PieceType.KING && board.getPiece(kingPos).getTeamColor() == teamColor) {
+                    break;
+                }
+            }
+        }
+
+        ChessPosition testPos = null;
+        ChessPiece testPiece = null;
+        for (int i = 1; i < 9; i++){
+            for (int j = 1; j <9; j++) {
+                testPos = new ChessPosition(i,j);
+                testPiece = board.getPiece(testPos);
+
+                if(testPiece.getPieceType() == ChessPiece.PieceType.KING || testPiece.getTeamColor() == teamColor){
+                    //I may be the problem, solution is below
+                    continue;
+                }
+
+                Collection<ChessMove> moveset = validMoves(testPos);
+                //Collection<ChessMove> moveset = testPiece.pieceMoves(board, testPos);
+
+
+                for (ChessMove move : moveset){
+                    if (move.getEndPosition() == kingPos){
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -78,7 +151,7 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        return !hasValidMoves(teamColor) && !isInCheck(teamColor);
     }
 
     /**
@@ -89,7 +162,7 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        return !hasValidMoves(teamColor) && !isInCheck(teamColor);
     }
 
     /**
@@ -98,7 +171,7 @@ public class ChessGame {
      * @param board the new board to use
      */
     public void setBoard(ChessBoard board) {
-        throw new RuntimeException("Not implemented");
+        this.board = board;
     }
 
     /**
@@ -107,6 +180,6 @@ public class ChessGame {
      * @return the chessboard
      */
     public ChessBoard getBoard() {
-        throw new RuntimeException("Not implemented");
+        return this.board;
     }
 }
