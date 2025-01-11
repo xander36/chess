@@ -38,9 +38,13 @@ public class ChessPosition {
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) {
+            System.out.println("I'm a lil techinical fool");
             return false;
         }
         ChessPosition that = (ChessPosition) o;
+        System.out.println(row == that.row);
+        System.out.println(col == that.col);
+
         return row == that.row && col == that.col;
     }
 
