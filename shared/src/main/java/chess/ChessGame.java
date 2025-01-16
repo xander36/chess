@@ -17,6 +17,7 @@ public class ChessGame {
     public ChessGame() {
         this.turn = TeamColor.WHITE;
         this.board = new ChessBoard();
+        board.resetBoard();
     }
 
     /**
@@ -75,6 +76,7 @@ public class ChessGame {
     }
 
     public boolean hasValidMoves(TeamColor color){
+        System.out.println("Valid moves check");
         ChessPosition testPos = null;
         ChessPiece testPiece = null;
         for (int i = 1; i < 9; i++){
@@ -82,13 +84,19 @@ public class ChessGame {
                 testPos = new ChessPosition(i,j);
                 testPiece = board.getPiece(testPos);
 
-                if(testPiece != null && testPiece.getTeamColor() == color){
+                if(testPiece != null && testPiece.getTeamColor() != color){
                     continue;
                 }
 
                 Collection<ChessMove> moveset = validMoves(testPos);
 
                 if (moveset != null && !moveset.isEmpty()){
+                    System.out.println("Valid moves for ");
+                    System.out.println(testPiece);
+                    System.out.println(testPos);
+                    System.out.println(moveset);
+
+
                     return true;
                 }
 
@@ -104,7 +112,11 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        System.out.println("");
+//        System.out.println("Lets do the following:");
+//        System.out.println(move);
+//        System.out.println("And we do it here:");
+//        System.out.println(board);
+
         ChessBoard oldBoard = new ChessBoard(board);
 
         ChessPosition start = move.getStartPosition();
@@ -212,7 +224,11 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        return !hasValidMoves(teamColor) && !isInCheck(teamColor);
+        System.out.println("Checkmate check");
+        System.out.println(board);
+        System.out.println(!hasValidMoves(teamColor));
+        System.out.println(isInCheck(teamColor));
+        return !hasValidMoves(teamColor) && isInCheck(teamColor);
     }
 
     /**
