@@ -337,6 +337,4 @@ public class ChessPiece {
 
         return out;
     }
-
-
 }
