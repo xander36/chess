@@ -1,4 +1,8 @@
 package dataaccess;
 
-public class MemoryGameDAO {
+public class MemoryGameDAO implements GameDAO{
+
+    public void clear() {
+
+    }
 }

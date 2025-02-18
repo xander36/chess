@@ -7,6 +7,7 @@ public class MemoryUserDAO implements UserDAO {
     private ArrayList<UserData> users = new ArrayList<>();
 
     public UserData getUser(String username) throws DataAccessException{
+        System.out.println("get user");
         for (UserData user : users){
             if (user.username().equals(username)){
                 return user;
@@ -17,6 +18,11 @@ public class MemoryUserDAO implements UserDAO {
     }
 
     public void createUser(UserData user){
+        System.out.println("make user");
         users.add(user);
+    }
+
+    public void clear() {
+        users.clear();
     }
 }

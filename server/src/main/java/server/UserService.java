@@ -1,3 +1,5 @@
+package server;
+
 import dataaccess.*;
 
 import java.util.UUID;
@@ -7,12 +9,19 @@ public class UserService {
     private UserDAO userAccess;
     private AuthDAO authAccess;
 
+    public UserService(){
+        userAccess = new MemoryUserDAO();
+        authAccess = new MemoryAuthDAO();
+
+    }
+
     public RegisterResult register(RegisterRequest registerRequest) throws DataAccessException{
         String username = registerRequest.username();
         String password = registerRequest.password();
         String email = registerRequest.email();
 
         UserData existingUser = userAccess.getUser(username);
+
 
         if (existingUser == null){
             throw new DataAccessException("username taken");
