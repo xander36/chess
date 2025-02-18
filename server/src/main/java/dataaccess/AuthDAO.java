@@ -1,4 +1,5 @@
 package dataaccess;
 
-public class AuthDAO {
+public interface AuthDAO {
+    abstract void createAuth(AuthData data);
 }

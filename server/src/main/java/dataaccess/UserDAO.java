@@ -1,4 +1,7 @@
 package dataaccess;
 
-public class UserDAO {
+public interface UserDAO {
+
+    UserData getUser(String username) throws DataAccessException;
+    void createUser(UserData user);
 }
