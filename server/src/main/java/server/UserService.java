@@ -51,7 +51,7 @@ public class UserService {
         AuthData newAuth = new AuthData(username, UUID.randomUUID().toString());
         authAccess.createAuth(newAuth);
 
-        return new LoginResult(username, password);
+        return new LoginResult( username, password);
     }
     public void logout(LogoutRequest logoutRequest) {
 
