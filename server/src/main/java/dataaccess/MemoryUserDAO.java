@@ -7,18 +7,16 @@ public class MemoryUserDAO implements UserDAO {
     private ArrayList<UserData> users = new ArrayList<>();
 
     public UserData getUser(String username) throws DataAccessException{
-        System.out.println("get user");
         for (UserData user : users){
             if (user.username().equals(username)){
                 return user;
             }
         }
 
-        throw new DataAccessException("Can't get nonexistent user");
+        return null;
     }
 
     public void createUser(UserData user){
-        System.out.println("make user");
         users.add(user);
     }
 

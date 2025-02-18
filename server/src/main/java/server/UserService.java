@@ -15,16 +15,19 @@ public class UserService {
 
     }
 
-    public RegisterResult register(RegisterRequest registerRequest) throws DataAccessException{
+    public RegisterResult register(RegisterRequest registerRequest) throws CredentialsException, DataAccessException{
         String username = registerRequest.username();
         String password = registerRequest.password();
         String email = registerRequest.email();
 
+        if (password == null){
+            throw new CredentialsException("no password");
+        }
+
         UserData existingUser = userAccess.getUser(username);
 
-
-        if (existingUser == null){
-            throw new DataAccessException("username taken");
+        if (existingUser != null){
+            throw new CredentialsException("username taken");
             //other stauses?
         }
 
@@ -37,24 +40,34 @@ public class UserService {
         return new RegisterResult(username, newAuth.authToken());
     }
 
-    public LoginResult login(LoginRequest loginRequest) throws DataAccessException{
+    public LoginResult login(LoginRequest loginRequest) throws CredentialsException, DataAccessException{
         String username = loginRequest.username();
         String password = loginRequest.password();
 
         UserData existingUser = userAccess.getUser(username);
 
+        if (existingUser == null){
+            throw new CredentialsException("no account");
+            //other stauses?
+        }
+
         if (!existingUser.password().equals(password)){
             //Error
-            throw new DataAccessException("incorrect password");
+            throw new CredentialsException("Incorrect Password");
         }
 
         AuthData newAuth = new AuthData(username, UUID.randomUUID().toString());
         authAccess.createAuth(newAuth);
 
-        return new LoginResult( username, password);
+        return new LoginResult(newAuth.username(), newAuth.authToken());
     }
-    public void logout(LogoutRequest logoutRequest) {
 
+    public void logout(LogoutRequest logoutRequest) throws CredentialsException{
+        String authToken = logoutRequest.authToken();
+
+        AuthData authorization = authAccess.getAuth(authToken);
+
+        authAccess.deleteAuth(authorization);
     }
 }
 
@@ -79,6 +92,6 @@ record LoginResult(String username,
 
 }
 
-record LogoutRequest(){
+record LogoutRequest(String authToken){
 
 }

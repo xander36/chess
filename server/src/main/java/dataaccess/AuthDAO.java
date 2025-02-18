@@ -1,6 +1,8 @@
 package dataaccess;
 
 public interface AuthDAO {
-    abstract void createAuth(AuthData data);
+    void createAuth(AuthData data);
+    AuthData getAuth(String authToken);
+    void deleteAuth(AuthData data);
     void clear();
 }
