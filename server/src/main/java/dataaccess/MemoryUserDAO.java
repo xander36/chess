@@ -12,7 +12,6 @@ public class MemoryUserDAO implements UserDAO {
                 return user;
             }
         }
-
         return null;
     }
 

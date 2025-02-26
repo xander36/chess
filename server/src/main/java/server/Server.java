@@ -1,6 +1,8 @@
 package server;
-import dataaccess.DataAccessException;
+import dataaccess.*;
 import spark.*;
+
+import java.util.ArrayList;
 
 import com.google.gson.Gson;
 
@@ -8,10 +10,16 @@ public class Server {
 
     private UserService userService;
     private ClearService clearService;
+    private GameService gameService;
+
 
     public int run(int desiredPort) {
-        this.userService = new UserService();
-        this.clearService = new ClearService();
+
+        UserDAO userAccess = new MemoryUserDAO();
+        AuthDAO authAccess = new MemoryAuthDAO();
+        GameDAO gameAccess = new MemoryGameDAO();
+        this.userService = new UserService(userAccess, authAccess, gameAccess);
+        this.clearService = new ClearService(userAccess, authAccess, gameAccess);
 
         Spark.port(desiredPort);
 
@@ -37,7 +45,7 @@ public class Server {
                 return String.format("{\"username\": \"%s\", \"authToken\": \"%s\"}", username, authToken);
 
             }  catch (CredentialsException e){
-                if (e.toString().equals("Incorrect Password") || e.toString().contains("no password")){
+                if (e.toString().contains("no authToken")){
                     res.status(400);
                     return "{ \"message\": \"Error: bad request\" }";
                 }
@@ -46,14 +54,6 @@ public class Server {
                     return "{ \"message\": \"Error: already taken\" }";
                 }
             }
-            /**
-             * catch (DataAccessException e) {
-             *                 if (e.toString().contains("Can't get nonexistent user")){
-             *                     res.status(403);
-             *                     return "{ \"message\": \"Error: already taken\" }";
-             *                 }
-             *             }
-             */
 
             res.status(400);
             return "{ \"message\": \"Error: bad request\" }";
@@ -71,8 +71,6 @@ public class Server {
                 String username = result.username();
                 String authToken = result.authToken();
 
-                System.out.println("We give token");
-                System.out.println(authToken);
                 res.status(200);
                 return String.format("{\"username\": \"%s\", \"authToken\": \"%s\"}", username, authToken);
 
@@ -90,19 +88,66 @@ public class Server {
         Spark.delete("/session", (req, res) -> {
             res.type("application/json");
 
+            String authToken = req.headers("Authorization");
 
-            LogoutRequest request = gson.fromJson(req.body(), LogoutRequest.class);
-            System.out.println("Built request:");
-            System.out.println(request);
+            AuthData data = authAccess.getAuth(authToken);
+
+            if (data == null) {
+                res.status(401);
+                return "{ \"message\": \"Error: unauthorized\" }";
+            }
+
+
+            userService.logout(new LogoutRequest(authToken));
+
+            res.status(200);
+            return "{}";
+
+
+        });
+
+        Spark.get("/game", (req, res) -> {
+            System.out.println("list games");
+
+            String authToken = req.headers("Authorization");
+
+            ListRequest request = new ListRequest(authToken);
+            ListResult result = gameService.listGames(request);
+
+            ArrayList<String> list = result.games();
+
+
+            StringBuilder outString = new StringBuilder();
+
+            outString.append("{ \"games\": [");
+            for (String gameDescription: list){
+                outString.append(gameDescription);
+                outString.append("\n");
+
+            }
+            outString.append("]}");
+
+            res.status(200);
+            return outString.toString();
+        });
+
+        Spark.post("/game", (req, res) -> {
+            res.type("application/json");
+
+            MakeGameRequest request = gson.fromJson(req.body(), MakeGameRequest.class);
 
             try {
-                userService.logout(request);
+                LoginResult result = gameService.makeGame(request);
+
+
+                String username = result.username();
+                String authToken = result.authToken();
 
                 res.status(200);
-                return "{}";
+                return String.format("{\"username\": \"%s\", \"authToken\": \"%s\"}", username, authToken);
 
             }  catch (CredentialsException e){
-                if (e.toString().contains("bad authToken")){
+                if (e.toString().contains("Incorrect Password") || e.toString().contains("no account")){
                     res.status(401);
                     return "{ \"message\": \"Error: unauthorized\" }";
 
@@ -110,9 +155,8 @@ public class Server {
             }
             res.status(500);
             return "{ \"message\": \"Error: bad request\" }";
+
         });
-        Spark.get("/game", (req, res) -> {return null;});
-        Spark.post("/game", (req, res) -> {return null;});
         Spark.put("/game", (req, res) -> {return null;});
         Spark.delete("/db", (req, res) -> {
             res.type("application/json");
@@ -120,7 +164,6 @@ public class Server {
             ClearRequest request = gson.fromJson(req.body(), ClearRequest.class);
 
             ClearResult result =  clearService.clear(request);
-
             res.status(200);
             return "{}";
         });

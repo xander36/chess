@@ -10,10 +10,11 @@ public class ClearService {
     private AuthDAO authAccess;
     private GameDAO gameAccess;
 
-    public ClearService(){
-        userAccess = new MemoryUserDAO();
-        authAccess = new MemoryAuthDAO();
-        gameAccess = new MemoryGameDAO();
+
+    public ClearService(UserDAO userAccess, AuthDAO authAccess, GameDAO gameAccess){
+        this.userAccess = userAccess;
+        this.authAccess = authAccess;
+        this.gameAccess = gameAccess;
     }
 
     public ClearResult clear(ClearRequest registerRequest) throws DataAccessException{

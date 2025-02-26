@@ -8,11 +8,12 @@ public class UserService {
 
     private UserDAO userAccess;
     private AuthDAO authAccess;
+    private GameDAO gameAccess;
 
-    public UserService(){
-        userAccess = new MemoryUserDAO();
-        authAccess = new MemoryAuthDAO();
-
+    public UserService(UserDAO userAccess, AuthDAO authAccess, GameDAO gameAccess){
+        this.userAccess = userAccess;
+        this.authAccess = authAccess;
+        this.gameAccess = gameAccess;
     }
 
     public RegisterResult register(RegisterRequest registerRequest) throws CredentialsException, DataAccessException{
@@ -21,7 +22,7 @@ public class UserService {
         String email = registerRequest.email();
 
         if (password == null){
-            throw new CredentialsException("no password");
+            throw new CredentialsException("no authToken");
         }
 
         UserData existingUser = userAccess.getUser(username);
