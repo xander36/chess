@@ -1,6 +1,7 @@
-package server;
+package service;
 
 import dataaccess.*;
+import server.CredentialsException;
 
 import java.util.UUID;
 

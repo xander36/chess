@@ -164,6 +164,7 @@ public class StandardAPITests {
     @Order(8)
     @DisplayName("Valid Creation")
     public void goodCreate() {
+
         TestCreateResult createResult = serverFacade.createGame(createRequest, existingAuth);
 
         assertHttpOk(createResult);
