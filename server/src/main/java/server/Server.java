@@ -8,8 +8,6 @@ import java.util.ArrayList;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
-import service.*;
-
 public class Server {
 
     private UserService userService;

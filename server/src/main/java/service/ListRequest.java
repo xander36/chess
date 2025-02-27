@@ -1,6 +1,6 @@
 package service;
 
 
-record ListRequest(String authToken){
+public record ListRequest(String authToken){
 
 }

@@ -23,10 +23,3 @@ public class ClearService {
     }
 }
 
-record ClearRequest(){
-
-}
-
-record ClearResult(){
-
-}
