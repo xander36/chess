@@ -211,7 +211,10 @@ public class ServiceTests {
             ListRequest request = new ListRequest(userAuthToken);
             ListResult result = gameService.listGames(request);
 
-            Assertions.assertEquals("[{\"gameID\": 1, \"whiteUsername\": null, \"blackUsername\": null, \"gameName\": \"chess2\"}]", result.games().toString());
+            Assertions.assertEquals("[{\"gameID\": 1, " +
+                    "\"whiteUsername\": null, " +
+                    "\"blackUsername\": null, " +
+                    "\"gameName\": \"chess2\"}]", result.games().toString());
 
         } catch (Exception e){
             //If listing the games throws an error fail the test by failing an assertion

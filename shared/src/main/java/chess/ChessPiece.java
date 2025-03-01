@@ -89,39 +89,40 @@ public class ChessPiece {
         int col = myPosition.getColumn();
 
         for (int i = row-1; i > 0; i--){
-            ChessPosition checkPosition = new ChessPosition(i, col);
-            if(!isFriendAt(board, checkPosition)) {
-                moves.add(new ChessMove(myPosition, checkPosition, null));
+            ChessPosition checkPositionUp = new ChessPosition(i, col);
+            if(!isFriendAt(board, checkPositionUp)) {
+                moves.add(new ChessMove(myPosition, checkPositionUp, null));
             }
-            if (!board.isEmptyAt(checkPosition)){
+            if (!board.isEmptyAt(checkPositionUp)){
                 break;
             }
         }
+
         for (int i = row+1; i < 9; i++){
-            ChessPosition checkPosition = new ChessPosition(i, col);
-            if(!isFriendAt(board, checkPosition)) {
-                moves.add(new ChessMove(myPosition, checkPosition, null));
+            ChessPosition checkPositionDown = new ChessPosition(i, col);
+            if(!isFriendAt(board, checkPositionDown)) {
+                moves.add(new ChessMove(myPosition, checkPositionDown, null));
             }
-            if (!board.isEmptyAt(checkPosition)){
+            if (!board.isEmptyAt(checkPositionDown)){
                 break;
             }
         }
 
         for (int i = col-1; i > 0; i--){
-            ChessPosition checkPosition = new ChessPosition(row, i);
-            if(!isFriendAt(board, checkPosition)) {
-                moves.add(new ChessMove(myPosition, checkPosition, null));
+            ChessPosition checkPositionLeft = new ChessPosition(row, i);
+            if(!isFriendAt(board, checkPositionLeft)) {
+                moves.add(new ChessMove(myPosition, checkPositionLeft, null));
             }
-            if (!board.isEmptyAt(checkPosition)){
+            if (!board.isEmptyAt(checkPositionLeft)){
                 break;
             }
         }
         for (int i = col+1; i < 9; i++){
-            ChessPosition checkPosition = new ChessPosition(row, i);
-            if(!isFriendAt(board, checkPosition)) {
-                moves.add(new ChessMove(myPosition, checkPosition, null));
+            ChessPosition checkPositionRight = new ChessPosition(row, i);
+            if(!isFriendAt(board, checkPositionRight)) {
+                moves.add(new ChessMove(myPosition, checkPositionRight, null));
             }
-            if (!board.isEmptyAt(checkPosition)){
+            if (!board.isEmptyAt(checkPositionRight)){
                 break;
             }
         }
