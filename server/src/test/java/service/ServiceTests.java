@@ -188,10 +188,10 @@ public class ServiceTests {
         try {
             userService.logout(request);
             //If the logout process doesnt throw an error, fail an assertion,
-            //since thr program clearly belives that "splorkenstein" is a valid authToken
+            //since thr program clearly believes that "splorkenstein" is a valid authToken
             Assertions.fail();
         } catch (Exception e){
-            //Inf no exceptions are thrown, pass the test
+            //If no exceptions are thrown, pass the test
         }
     }
 
