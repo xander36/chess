@@ -16,7 +16,8 @@ public class MemoryGameDAO implements GameDAO {
         ArrayList<String> outList = new ArrayList<String>();
 
         for (GameData game : games){
-            outList.add(String.format("{\"gameID\": %s, \"whiteUsername\": %s, \"blackUsername\": %s, \"gameName\": \"%s\"}", ""+game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName()));
+            outList.add(String.format("{\"gameID\": %s, \"whiteUsername\": %s, \"blackUsername\": %s, \"gameName\": \"%s\"}",
+                    game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName()));
         }
 
         return outList;

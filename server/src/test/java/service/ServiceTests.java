@@ -29,12 +29,21 @@ public class ServiceTests {
 
     private String quickRegister(){
         RegisterRequest request = new RegisterRequest("me", "you lol", "me@gmail.com");
-        RegisterResult result = null;
         try {
-            result = userService.register(request);
+            RegisterResult result = userService.register(request);
             return result.authToken();
         } catch (Exception e){
             throw new RuntimeException("Somehow you screwed up the reigistartion process. nice.");
+        }
+    }
+
+    private int quickStartGame(String authToken){
+        MakeGameRequest request = new MakeGameRequest(authToken, "chess2");
+        try {
+            MakeGameResult result = gameService.makeGame(request);
+            return result.gameID();
+        } catch (Exception e){
+            throw new RuntimeException("Somehow you screwed up the start of a game. nice.");
         }
     }
 
@@ -46,7 +55,6 @@ public class ServiceTests {
 
         //Attempt to register "user"
         RegisterRequest request = new RegisterRequest("user", "password", "address@gmail.com");
-        RegisterResult result = null;
         try {
             userService.register(request);
             try{
@@ -73,9 +81,8 @@ public class ServiceTests {
 
         //Register a user
         RegisterRequest request = new RegisterRequest("me", "you lol", "me@gmail.com");
-        RegisterResult result = null;
         try {
-            result = userService.register(request);
+            userService.register(request);
         } catch (Exception e){
             //In this test it is assumed that registering to a blank database will always work, so this block is blank
         }
@@ -83,9 +90,9 @@ public class ServiceTests {
         //Try to re-register the same user again. If all is correct, it should throw an error
         //If no error is thrown, fail an assertion
         RegisterRequest request2 = new RegisterRequest("me", "you lol", "me@gmail.com");
-        RegisterResult result2 = null;
+
         try {
-            result2 = userService.register(request);
+            userService.register(request2);
             //If the above line ran succesfully, the service class failed to stop a repeat user
             Assertions.fail();
         } catch (Exception e){
@@ -103,9 +110,8 @@ public class ServiceTests {
 
         //Attempt to log in as "me"
         LoginRequest request = new LoginRequest("me", "you lol");
-        LoginResult result = null;
         try {
-            result = userService.login(request);
+            LoginResult result = userService.login(request);
             try{
                 //Use the DAO to see if the user was added
                 AuthData data = authAccess.getAuth(result.authToken());
@@ -132,9 +138,8 @@ public class ServiceTests {
 
         //Attempt to log in as "me" with the wrong password
         LoginRequest request = new LoginRequest("me", "wrong password");
-        LoginResult result = null;
         try {
-            result = userService.login(request);
+            userService.login(request);
             //If the login process doesnt throw an error, fail an assertion
             //You gave it the wrong password and it let you off scott-free!
             Assertions.fail();
@@ -199,42 +204,139 @@ public class ServiceTests {
     @Order(7)
     @DisplayName("GameService: list games success test")
     public void listGamesSuccess(){
-        Assertions.fail();
+        reset();
+        String userAuthToken = quickRegister();
+        int newGameID = quickStartGame(userAuthToken);
+
+        try{
+            ListRequest request = new ListRequest(userAuthToken);
+            ListResult result = gameService.listGames(request);
+
+            Assertions.assertEquals("[{}]", result.games().toString());
+
+        } catch (Exception e){
+            //If listing the games throws an error fail the test by failing an assertion
+            Assertions.fail();
+        }reset();
+
+
     }
 
     @Test
     @Order(8)
     @DisplayName("GameService: list games failure test")
     public void listGamesFailure(){
-        Assertions.fail();
+        //Register the test user: "me" and hold onto its authtoken output
+        reset();
+        String userAuthToken = quickRegister();
+
+
+        //Attempt to make a game using a blatantly incorrect authtoken
+        String madeUpAuthToken = "splorkenstein";
+        ListRequest request = new ListRequest(madeUpAuthToken);
+
+        try {
+            gameService.listGames(request);
+            //If making a game without authorization doesnt throw an error, fail an assertion,
+            //since thr program clearly believes that "splorkenstein" is a valid authToken
+            Assertions.fail();
+        } catch (Exception e){
+            //If no exceptions are thrown, pass the test
+        }
     }
 
     @Test
     @Order(9)
     @DisplayName("GameService: make game success test")
     public void makeGameSuccess(){
-        Assertions.fail();
+        reset();
+        String userAuthToken = quickRegister();
+        int newGameID = quickStartGame(userAuthToken);
+
+        try{
+            MakeGameRequest request = new MakeGameRequest(userAuthToken, "a chess game");
+            MakeGameResult result = gameService.makeGame(request);
+
+            GameData game = gameAccess.getGame(result.gameID());
+
+            Assertions.assertEquals(newGameID, game.gameID());
+            Assertions.assertEquals("a chess game", game.gameName());
+            Assertions.assertEquals(null, game.whiteUsername());
+            Assertions.assertEquals(null, game.blackUsername());
+
+        } catch (Exception e){
+            //If making a game throws an error fail the test by failing an assertion
+            Assertions.fail();
+        }
     }
 
     @Test
     @Order(10)
     @DisplayName("GameService: make game failure test")
     public void makeGameFailure(){
-        Assertions.fail();
+        //Register the test user: "me" and hold onto its authtoken output
+        reset();
+        String userAuthToken = quickRegister();
+
+
+        //Attempt to make a game using a blatantly incorrect authtoken
+        String madeUpAuthToken = "splorkenstein";
+        MakeGameRequest request = new MakeGameRequest(madeUpAuthToken, "fun game");
+
+        try {
+            gameService.makeGame(request);
+            //If making a game without authorization doesnt throw an error, fail an assertion,
+            //since thr program clearly believes that "splorkenstein" is a valid authToken
+            Assertions.fail();
+        } catch (Exception e){
+            //If no exceptions are thrown, pass the test
+        }
     }
 
     @Test
     @Order(11)
     @DisplayName("GameService: join game success test")
     public void joinGameSuccess(){
-        Assertions.fail();
+        reset();
+        String userAuthToken = quickRegister();
+        int newGameID = quickStartGame(userAuthToken);
+
+        try{
+            JoinGameRequest request = new JoinGameRequest(userAuthToken, "WHITE", newGameID);
+            gameService.joinGame(request);
+
+            GameData game = gameAccess.getGame(newGameID);
+            //Make sure that the new white player is "me"
+            Assertions.assertEquals("me", game.whiteUsername());
+
+        } catch (Exception e){
+            //If joining a game throws an error fail the test by failing an assertion
+            Assertions.fail();
+        }
     }
 
     @Test
     @Order(12)
     @DisplayName("GameService: join game failure test")
     public void joinGameFailure(){
-        Assertions.fail();
+        //Register the test user: "me" and hold onto its authtoken output
+        reset();
+        String userAuthToken = quickRegister();
+        int newGameID = quickStartGame(userAuthToken);
+
+
+        //Attempt to join a game using a blatantly incorrect authtoken
+        String madeUpAuthToken = "splorkenstein";
+        JoinGameRequest request = new JoinGameRequest(madeUpAuthToken, "WHITE", newGameID);
+
+        try {
+            gameService.joinGame(request);
+            //If joining a game without authorization doesnt throw an error, fail an assertion,
+            //since thr program clearly believes that "splorkenstein" is a valid authToken
+            Assertions.fail();
+        } catch (Exception e){
+            //If no exceptions are thrown, pass the test
+        }
     }
 
     @Test
@@ -242,14 +344,22 @@ public class ServiceTests {
     @DisplayName("ClearService: clear test")
     public void clearServicePositive(){
         reset();
+        String userAuthToken = quickRegister();
 
-        RegisterRequest request = new RegisterRequest("me", "you lol", "me@gmail.com");
-        RegisterResult result = null;
+        ClearRequest request = new ClearRequest();
+        clearService.clear(request);
+
         try {
-            result = userService.register(request);
-        } catch (Exception e){
+            userAccess.getUser("me");
+            //If the user data for "me" is still there, the clear failed
             Assertions.fail();
-        }
+        } catch (Exception e){}
+        try {
+            authAccess.getAuth(userAuthToken);
+            //If the authoriztion of "me"s login is still there, the clear failed
+            Assertions.fail();
+        }catch (Exception e){}
+
 
     }
 
