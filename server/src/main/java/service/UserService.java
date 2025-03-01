@@ -26,36 +26,39 @@ public class UserService {
             throw new CredentialsException("no authToken");
         }
 
-        UserData existingUser = userAccess.getUser(username);
+        try {
+            UserData existingUser = userAccess.getUser(username);
 
-        if (existingUser != null){
             throw new CredentialsException("username taken");
-            //other stauses?
+
+        }
+        catch (DataAccessException e){
+
+            UserData newUser = new UserData(username, password, email);
+            userAccess.createUser(newUser);
+
+            AuthData newAuth = new AuthData(username, UUID.randomUUID().toString());
+            authAccess.createAuth(newAuth);
+
+            return new RegisterResult(username, newAuth.authToken());
         }
 
-        UserData newUser = new UserData(username, password, email);
-        userAccess.createUser(newUser);
 
-        AuthData newAuth = new AuthData(username, UUID.randomUUID().toString());
-        authAccess.createAuth(newAuth);
-
-        return new RegisterResult(username, newAuth.authToken());
     }
 
-    public LoginResult login(LoginRequest loginRequest) throws CredentialsException, DataAccessException{
+    public LoginResult login(LoginRequest loginRequest) throws CredentialsException{
         String username = loginRequest.username();
         String password = loginRequest.password();
 
-        UserData existingUser = userAccess.getUser(username);
+        try {
+            UserData existingUser = userAccess.getUser(username);
 
-        if (existingUser == null){
+            if (!existingUser.password().equals(password)){
+                throw new CredentialsException("Incorrect Password");
+            }
+
+        } catch (DataAccessException e) {
             throw new CredentialsException("no account");
-            //other stauses?
-        }
-
-        if (!existingUser.password().equals(password)){
-            //Error
-            throw new CredentialsException("Incorrect Password");
         }
 
         AuthData newAuth = new AuthData(username, UUID.randomUUID().toString());
@@ -64,7 +67,7 @@ public class UserService {
         return new LoginResult(newAuth.username(), newAuth.authToken());
     }
 
-    public void logout(LogoutRequest logoutRequest) throws CredentialsException{
+    public void logout(LogoutRequest logoutRequest) throws DataAccessException{
         String authToken = logoutRequest.authToken();
 
         AuthData authorization = authAccess.getAuth(authToken);

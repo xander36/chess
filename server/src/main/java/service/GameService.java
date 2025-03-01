@@ -18,56 +18,46 @@ public class GameService {
         this.gameAccess = gameAccess;
     }
 
-    public ListResult listGames(ListRequest listRequest) throws CredentialsException {
+    public ListResult listGames(ListRequest listRequest) throws DataAccessException {
         String authToken = listRequest.authToken();
 
-        if (authAccess.getAuth(authToken) == null) {
-            throw new CredentialsException("Not an authorized user");
-        }
+        authAccess.getAuth(authToken);
 
         return new ListResult(gameAccess.listGames(authToken));
     }
 
-    public MakeGameResult makeGame(MakeGameRequest request) throws CredentialsException, DataAccessException{
-        String authToken = request.authToken();
+    public MakeGameResult makeGame(MakeGameRequest makeGameRequest) throws DataAccessException{
+        String authToken = makeGameRequest.authToken();
+        authAccess.getAuth(authToken);
 
-        if (authAccess.getAuth(authToken) == null) {
-            throw new CredentialsException("Not an authorized user");
-        }
-
-        int newGameId = gameAccess.makeGame(request.gameName());
+        int newGameId = gameAccess.makeGame(makeGameRequest.gameName());
 
         return new MakeGameResult(newGameId);
     }
 
-    public void joinGame(JoinGameRequest request) throws CredentialsException, ChessMatchException {
-        String authToken = request.authToken();
-
-        if (authAccess.getAuth(authToken) == null) {
-            throw new CredentialsException("Not an authorized user");
-        }
+    public void joinGame(JoinGameRequest joinGameRequest) throws DataAccessException, ChessMatchException{
+        String authToken = joinGameRequest.authToken();
 
         AuthData auth = authAccess.getAuth(authToken);
         String username = auth.username();
 
-        int gameID = request.gameID();
-
+        int gameID = joinGameRequest.gameID();
 
         try {
             GameData game = gameAccess.getGame(gameID);
 
             GameData newGame;
-            if (request.playerColor() == null) {
+            if (joinGameRequest.playerColor() == null) {
                 throw new ChessMatchException("Null team");
             }
 
-            if (request.playerColor().equals("WHITE")) {
+            if (joinGameRequest.playerColor().equals("WHITE")) {
                 if (game.whiteUsername() == null) {
                     newGame = new GameData(gameID, username, game.blackUsername(), game.gameName(), game.game());
                 } else {
                     throw new ChessMatchException("white user spot taken");
                 }
-            } else if (request.playerColor().equals("BLACK")) {
+            } else if (joinGameRequest.playerColor().equals("BLACK")) {
                 if (game.blackUsername() == null) {
                     newGame = new GameData(gameID, game.whiteUsername(), username, game.gameName(), game.game());
                 } else {

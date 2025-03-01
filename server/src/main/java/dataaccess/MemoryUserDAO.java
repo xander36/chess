@@ -12,7 +12,7 @@ public class MemoryUserDAO implements UserDAO {
                 return user;
             }
         }
-        return null;
+        throw new DataAccessException("No user with that name");
     }
 
     public void createUser(UserData user){

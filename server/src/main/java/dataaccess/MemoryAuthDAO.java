@@ -11,13 +11,13 @@ public class MemoryAuthDAO implements AuthDAO {
         authorizations.add(data);
     }
 
-    public AuthData getAuth(String token){
+    public AuthData getAuth(String token) throws DataAccessException{
         for (AuthData auth : authorizations){
             if (auth.authToken().equals(token)){
                 return auth;
             }
         }
-        return null;
+        throw new DataAccessException("Invalid Authorization");
     }
 
     public void clear() {

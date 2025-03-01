@@ -15,7 +15,7 @@ public class ClearService {
         this.gameAccess = gameAccess;
     }
 
-    public ClearResult clear(ClearRequest registerRequest) throws DataAccessException{
+    public ClearResult clear(ClearRequest registerRequest){
         userAccess.clear();
         authAccess.clear();
         gameAccess.clear();
