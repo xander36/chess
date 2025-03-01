@@ -167,7 +167,9 @@ public class ChessGame {
             for (int j = 1; j <9; j++) {
                 kingTestPos = new ChessPosition(i, j);
 
-                if (board.getPiece(kingTestPos) != null && board.getPiece(kingTestPos).getPieceType() == ChessPiece.PieceType.KING && board.getPiece(kingTestPos).getTeamColor() == teamColor) {
+                if (board.getPiece(kingTestPos) != null &&
+                        board.getPiece(kingTestPos).getPieceType() == ChessPiece.PieceType.KING &&
+                        board.getPiece(kingTestPos).getTeamColor() == teamColor) {
                     kingPos = kingTestPos;
                     break;
                 }

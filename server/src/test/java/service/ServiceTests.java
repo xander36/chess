@@ -1,9 +1,8 @@
-package java.service;
+package service;
 
 import dataaccess.*;
 import org.junit.jupiter.api.*;
 
-import service.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ServiceTests {
@@ -212,7 +211,7 @@ public class ServiceTests {
             ListRequest request = new ListRequest(userAuthToken);
             ListResult result = gameService.listGames(request);
 
-            Assertions.assertEquals("[{}]", result.games().toString());
+            Assertions.assertEquals("[{\"gameID\": 1, \"whiteUsername\": null, \"blackUsername\": null, \"gameName\": \"chess2\"}]", result.games().toString());
 
         } catch (Exception e){
             //If listing the games throws an error fail the test by failing an assertion
@@ -251,7 +250,6 @@ public class ServiceTests {
     public void makeGameSuccess(){
         reset();
         String userAuthToken = quickRegister();
-        int newGameID = quickStartGame(userAuthToken);
 
         try{
             MakeGameRequest request = new MakeGameRequest(userAuthToken, "a chess game");
@@ -259,7 +257,7 @@ public class ServiceTests {
 
             GameData game = gameAccess.getGame(result.gameID());
 
-            Assertions.assertEquals(newGameID, game.gameID());
+            Assertions.assertEquals(result.gameID(), game.gameID());
             Assertions.assertEquals("a chess game", game.gameName());
             Assertions.assertEquals(null, game.whiteUsername());
             Assertions.assertEquals(null, game.blackUsername());
