@@ -4,6 +4,7 @@ import java.sql.*;
 import java.util.Properties;
 
 public class DatabaseManager {
+
     private static final String DATABASE_NAME;
     private static final String USER;
     private static final String PASSWORD;
@@ -13,6 +14,7 @@ public class DatabaseManager {
      * Load the database information for the db.properties file.
      */
     static {
+        System.out.println("load info");
         try {
             try (var propStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("db.properties")) {
                 if (propStream == null) {
@@ -37,9 +39,13 @@ public class DatabaseManager {
      * Creates the database if it does not already exist.
      */
     static void createDatabase() throws DataAccessException {
+        System.out.println("make database");
         try {
             var statement = "CREATE DATABASE IF NOT EXISTS " + DATABASE_NAME;
+            System.out.println("connection?");
+            
             var conn = DriverManager.getConnection(CONNECTION_URL, USER, PASSWORD);
+            System.out.println("connection");
             try (var preparedStatement = conn.prepareStatement(statement)) {
                 preparedStatement.executeUpdate();
             }

@@ -13,6 +13,14 @@
 
     <packaging>jar</packaging>
 
+    <dependencies>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.33</version>
+        </dependency>
+    </dependencies>
+
     <build>
         <finalName>shared</finalName>
         <plugins>
@@ -57,5 +65,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>
