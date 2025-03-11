@@ -1,32 +1,74 @@
 package service;
 
-import dataaccess.AuthData;
-import dataaccess.DataAccessException;
-import dataaccess.GameData;
-import dataaccess.UserData;
+import dataaccess.*;
 import org.junit.jupiter.api.*;
 
 import java.util.ArrayList;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class DataAccessTests {
-    
+
+    UserDAO userAccess;
+    AuthDAO authAccess;
+    GameDAO gameAccess;
+
+    //Utility functions reset and quickRegister
+
+    public void reset(){
+        //Reset the database
+        userAccess = new DatabaseUserDAO();
+        authAccess = new DatabaseAuthDAO();
+        gameAccess = new DatabaseGameDAO();
+    }
+
+
     //User
+
+    @Test
+    @Order(1)
+    public void createUserTestPass(){
+        reset();
+
+        UserData user = new UserData("mr fun", "password", "lol@aol.com");
+        userAccess.createUser(user);
+        try {
+            UserData retrieve = userAccess.getUser("mr fun");
+            Assertions.assertEquals(user.username(), retrieve.username());
+            Assertions.assertEquals(user.username(), retrieve.username());
+            Assertions.assertEquals(user.username(), retrieve.username());
+        } catch (Exception e){
+            Assertions.fail();
+        }
+
+    }
+    @Test
+    @Order(1)
+    public void createUserTestFail(){
+        //How does this fail?
+        Assertions.fail();
+    }
+
     @Test
     @Order(1)
     public void getUserTestPass(){
+        reset();
 
-        Assertions.fail();
+        UserData user = new UserData("mr fun", "password", "lol@aol.com");
+        userAccess.createUser(user);
+        try {
+            UserData retrieve = userAccess.getUser("mr fun");
+            Assertions.assertEquals(user.username(), retrieve.username());
+            Assertions.assertEquals(user.username(), retrieve.username());
+            Assertions.assertEquals(user.username(), retrieve.username());
+        } catch (Exception e){
+            Assertions.fail();
+        }
+
     }
     @Test
     @Order(1)
     public void getUserTestFail(){Assertions.fail();}
-    @Test
-    @Order(1)
-    public void createUserTestPass(){Assertions.fail();}
-    @Test
-    @Order(1)
-    public void createUserTestFail(){Assertions.fail();}
+
     @Test
     @Order(1)
     public void userClearTestPass(){Assertions.fail();}
