@@ -2,6 +2,7 @@ package dataaccess;
 
 import org.mindrot.jbcrypt.BCrypt;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class DatabaseUserDAO implements UserDAO {
@@ -10,11 +11,10 @@ public class DatabaseUserDAO implements UserDAO {
         String[] creationSQL = {
                 """
                 CREATE TABLE IF NOT EXISTS user (
-                  `id` int NOT NULL AUTO_INCREMENT,
                   `username` VARCHAR(256) NOT NULL,
                   `password` VARCHAR(256) NOT NULL,
                   `email` VARCHAR(256) NOT NULL,
-                   PRIMARY KEY (`id`),
+                   PRIMARY KEY (`username`),
                    INDEX(username)
                  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
  
@@ -37,39 +37,65 @@ public class DatabaseUserDAO implements UserDAO {
     }
 
     public UserData getUser(String username) throws DataAccessException{
+        System.out.println("get");
         try (var conn = DatabaseManager.getConnection()) {
+
+            System.out.println("connection made");
             String addStatement = "SELECT username, password, email FROM user WHERE username = ?";
             try (var preparedStatement = conn.prepareStatement(addStatement)) {
+                System.out.println("teterent ready");
                 preparedStatement.setString(1, username);
                 var rs = preparedStatement.executeQuery();
+                System.out.println("query executed");
                 if (!rs.next()) {
+                    System.out.println("no user with name");
                     throw new DataAccessException("No user with that name");
                 } else {
+                    System.out.println("got it");
                     String password = rs.getString(2);
                     String email = rs.getString(3);
+
+                    System.out.println("successful");
                     return new UserData(username, password, email);
                 }
-
-
-
             }
         } catch (java.sql.SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public void createUser(UserData user){
+    public void createUser(UserData user) throws DataAccessException{
+        System.out.println("creation prep");
+        boolean usernameAvailable = true;
+        try {
+            getUser(user.username());
+            usernameAvailable = false;
+
+        } catch (DataAccessException e){
+
+        }
+
+        if (!usernameAvailable){
+            throw new DataAccessException("username unavailable");
+        }
+
+        System.out.println("creation time");
+
         try (var conn = DatabaseManager.getConnection()) {
+            System.out.println("connection made");
             String addStatement = "INSERT INTO user (username, password, email) VALUES (?, ?, ?)";
             try (var preparedStatement = conn.prepareStatement(addStatement)) {
+                System.out.println("teterent ready");
                 preparedStatement.setString(1, user.username());
                 preparedStatement.setString(2, user.password());
                 preparedStatement.setString(3, user.email());
 
                 var rs = preparedStatement.executeUpdate();
+                System.out.println("insert complete");
+                return;
             }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (SQLException ee) {
+            throw new RuntimeException(ee);
         }
 
     }

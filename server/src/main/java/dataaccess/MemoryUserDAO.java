@@ -15,8 +15,19 @@ public class MemoryUserDAO implements UserDAO {
         throw new DataAccessException("No user with that name");
     }
 
-    public void createUser(UserData user){
-        users.add(user);
+    public void createUser(UserData user) throws DataAccessException{
+        System.out.println("create in memory");
+        try{
+            getUser(user.username());
+            System.out.println("no problems means username is taken");
+
+        }catch (DataAccessException e){
+            //If the user doesnt exist then we're good to add it
+            users.add(user);
+            return;
+        }
+        throw new DataAccessException("username taken");
+
     }
 
     public void clear() {

@@ -39,11 +39,12 @@ public class UserHandler {
             return String.format("{\"username\": \"%s\", \"authToken\": \"%s\"}", username, authToken);
 
         }  catch (CredentialsException e){
+            System.out.println(e.toString());
             if (e.toString().contains("no authToken")){
                 res.status(400);
                 return "{ \"message\": \"Error: bad request\" }";
             }
-            else if (e.toString().contains("username taken")){
+            else if (e.toString().contains("username taken") ){
                 res.status(403);
                 return "{ \"message\": \"Error: already taken\" }";
             }

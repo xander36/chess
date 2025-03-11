@@ -27,25 +27,26 @@ public class UserService {
         String password = BCrypt.hashpw(registerRequest.password(), BCrypt.gensalt());
         String email = registerRequest.email();
 
-
+        System.out.println("here goes");
         if (registerRequest.password() == null){
             throw new CredentialsException("no authToken");
         }
+        System.out.println("no probs");
 
         try {
-            UserData existingUser = userAccess.getUser(username);
-
-            throw new CredentialsException("username taken");
-        } catch (DataAccessException e){
+            System.out.println("attempt creation");
             UserData newUser = new UserData(username, password, email);
             userAccess.createUser(newUser);
+            System.out.println("no problems");
 
             AuthData newAuth = new AuthData(username, UUID.randomUUID().toString());
             authAccess.createAuth(newAuth);
 
             return new RegisterResult(username, newAuth.authToken());
+        } catch (DataAccessException e){
+            System.out.println(e.toString());
+            throw new CredentialsException("username taken");
         }
-
 
     }
 

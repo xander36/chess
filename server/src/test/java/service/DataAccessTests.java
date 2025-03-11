@@ -30,12 +30,13 @@ public class DataAccessTests {
         reset();
 
         UserData user = new UserData("mr fun", "password", "lol@aol.com");
-        userAccess.createUser(user);
         try {
+            userAccess.createUser(user);
+
             UserData retrieve = userAccess.getUser("mr fun");
             Assertions.assertEquals(user.username(), retrieve.username());
-            Assertions.assertEquals(user.username(), retrieve.username());
-            Assertions.assertEquals(user.username(), retrieve.username());
+            Assertions.assertEquals(user.password(), retrieve.username());
+            Assertions.assertEquals(user.email(), retrieve.username());
         } catch (Exception e){
             Assertions.fail();
         }
@@ -54,8 +55,8 @@ public class DataAccessTests {
         reset();
 
         UserData user = new UserData("mr fun", "password", "lol@aol.com");
-        userAccess.createUser(user);
         try {
+            userAccess.createUser(user);
             UserData retrieve = userAccess.getUser("mr fun");
             Assertions.assertEquals(user.username(), retrieve.username());
             Assertions.assertEquals(user.username(), retrieve.username());
@@ -67,41 +68,126 @@ public class DataAccessTests {
     }
     @Test
     @Order(1)
-    public void getUserTestFail(){Assertions.fail();}
+    public void getUserTestFail(){
+        //How does this fail?
+        Assertions.fail();
+    }
 
     @Test
     @Order(1)
-    public void userClearTestPass(){Assertions.fail();}
-    @Test
-    @Order(1)
-    public void userClearTestFail(){Assertions.fail();}
+    public void userClearTestPass(){
+        try{
+            userAccess.clear();
+        }catch (Exception e){
+            Assertions.fail();
+        }
+    }
+
 
 
     //Game
+    @Test
+    @Order(1)
+    public void makeGameTestPass(){
+        reset();
+        try {
+            gameAccess.makeGame("fun game");
+
+            GameData retrieve = gameAccess.getGame(1);
+
+            Assertions.assertEquals("fun game", retrieve.gameName());
+            Assertions.assertNull(retrieve.whiteUsername());
+            Assertions.assertNull(retrieve.blackUsername());
+            Assertions.assertEquals(1, retrieve.gameID());
+
+            gameAccess.makeGame("another game");
+
+            retrieve = gameAccess.getGame(2);
+
+            Assertions.assertEquals("another game", retrieve.gameName());
+            Assertions.assertNull(retrieve.whiteUsername());
+            Assertions.assertNull(retrieve.blackUsername());
+            Assertions.assertEquals(2, retrieve.gameID());
+
+
+        }catch(Exception e){
+            Assertions.fail();
+        }
+    }
+    @Test
+    @Order(1)
+    public void makeGameTestFail(){
+        //How to fail
+    }
+
+    @Test
+    @Order(1)
+    public void getGameTestPass(){
+        reset();
+        try {
+            gameAccess.makeGame("fun game");
+
+            GameData retrieve = gameAccess.getGame(1);
+
+            Assertions.assertEquals("fun game", retrieve.gameName());
+            Assertions.assertNull(retrieve.whiteUsername());
+            Assertions.assertNull(retrieve.blackUsername());
+            Assertions.assertEquals(1, retrieve.gameID());
+
+            gameAccess.makeGame("another game");
+
+            retrieve = gameAccess.getGame(2);
+
+            Assertions.assertEquals("another game", retrieve.gameName());
+            Assertions.assertNull(retrieve.whiteUsername());
+            Assertions.assertNull(retrieve.blackUsername());
+            Assertions.assertEquals(2, retrieve.gameID());
+
+
+        }catch(Exception e){
+            Assertions.fail();
+        }
+    }
+    @Test
+    @Order(1)
+    public void getGameTestFail(){
+        reset();
+        try {
+            gameAccess.makeGame("fun game");
+
+            GameData retrieve = gameAccess.getGame(2);
+
+            Assertions.fail();
+
+
+        }catch(Exception e){
+            //Good, an error was thrown when trying to get a noneistant game
+        }
+    }
+
     @Test
     @Order(1)
     public void listGamesTestPass(){Assertions.fail();}
     @Test
     @Order(1)
     public void listGamesTestFail(){Assertions.fail();}
-    public void gameClearTestPass(){Assertions.fail();}
-    @Test
-    @Order(1)
-    public void gameClearTestFail(){Assertions.fail();}
-    public void makeGameTestPass(){Assertions.fail();}
-    @Test
-    @Order(1)
-    public void makeGameTestFail(){Assertions.fail();}
-    public void getGameTestPass(){Assertions.fail();}
-    @Test
-    @Order(1)
-    public void getGameTestFail(){Assertions.fail();}
+
+
     @Test
     @Order(1)
     public void updateGameTestPass(){Assertions.fail();}
     @Test
     @Order(1)
     public void updateGameTestFail(){Assertions.fail();}
+    @Test
+    @Order(1)
+    public void gameClearTestPass(){
+        try{
+            userAccess.clear();
+        }catch (Exception e){
+            Assertions.fail();
+        }
+    }
 
     //Auth
     @Test
@@ -124,8 +210,11 @@ public class DataAccessTests {
     public void deleteAuthTestFail(){Assertions.fail();}
     @Test
     @Order(1)
-    public void authClearTestPass(){Assertions.fail();}
-    @Test
-    @Order(1)
-    public void authClearTestFail(){Assertions.fail();}
+    public void authClearTestPass(){
+        try{
+            authAccess.clear();
+        }catch (Exception e){
+            Assertions.fail();
+        }
+    }
 }
