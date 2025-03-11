@@ -23,14 +23,9 @@ public class UserService {
     }
 
     public RegisterResult register(RegisterRequest registerRequest) throws CredentialsException{
-        System.out.println("Service wants to register");
         String username = registerRequest.username();
         String password = BCrypt.hashpw(registerRequest.password(), BCrypt.gensalt());
         String email = registerRequest.email();
-
-        System.out.println(registerRequest.password());
-        System.out.println("maps to");
-        System.out.println(password);
 
 
         if (registerRequest.password() == null){
@@ -42,7 +37,6 @@ public class UserService {
 
             throw new CredentialsException("username taken");
         } catch (DataAccessException e){
-            System.out.println("storing password " + password);
             UserData newUser = new UserData(username, password, email);
             userAccess.createUser(newUser);
 
@@ -62,8 +56,6 @@ public class UserService {
         try {
             UserData existingUser = userAccess.getUser(username);
 
-            System.out.println("Database is storing the following");
-            System.out.println(existingUser.password());
             if (!BCrypt.checkpw(password, existingUser.password())) {
                 throw new CredentialsException("Incorrect Password");
             }

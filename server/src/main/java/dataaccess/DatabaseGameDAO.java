@@ -8,6 +8,8 @@ import java.util.ArrayList;
 
 public class DatabaseGameDAO implements GameDAO {
 
+    int size = 0;
+
     public DatabaseGameDAO(){
         String[] creationSQL = {
                 """
@@ -33,11 +35,10 @@ public class DatabaseGameDAO implements GameDAO {
                     }
                 }
             } catch(Exception e){
-                System.out.println(e.toString());
-                System.out.println("game had connection problem");
+                //System.out.println("game had connection problem");
             }
         } catch (DataAccessException e) {
-            System.out.println("Database connection had a problem");
+            //System.out.println("Database connection had a problem");
         }
     }
 
@@ -45,21 +46,21 @@ public class DatabaseGameDAO implements GameDAO {
         try (var conn = DatabaseManager.getConnection()) {
             String addStatement = "TRUNCATE TABLE game";
             try (var preparedStatement = conn.prepareStatement(addStatement)) {
-
+                System.out.println(preparedStatement.toString());
                 var rs = preparedStatement.executeUpdate();
+                size = 0;
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    public ArrayList<String> listGames (String authToken){
+    public ArrayList<String> listGames (String authToken) throws DataAccessException{
         ArrayList<String> outList = new ArrayList<String>();
-
         try (var conn = DatabaseManager.getConnection()) {
             String addStatement = "SELECT gameID, whiteUsername, blackUsername, gameName, game FROM game";
             try (var preparedStatement = conn.prepareStatement(addStatement)) {
-
+                System.out.println(preparedStatement.toString());
                 var rs = preparedStatement.executeQuery();
                 while (rs.next()) {
                     int gameID = rs.getInt(1);
@@ -81,15 +82,17 @@ public class DatabaseGameDAO implements GameDAO {
                 }
 
             }
-        } catch (Exception e) {
+        } catch (java.sql.SQLException e) {
             throw new RuntimeException(e);
         }
 
         return outList;
     }
 
-    public int makeGame(String gameName){
-        int newId = 15;
+    public int makeGame(String gameName) throws DataAccessException{
+        int newId = size+1;
+        System.out.println("Make number");
+        System.out.println(newId);
         GameData newGame = new GameData(newId, null, null, gameName, null);
 
         try (var conn = DatabaseManager.getConnection()) {
@@ -101,12 +104,14 @@ public class DatabaseGameDAO implements GameDAO {
                 preparedStatement.setString(4, newGame.gameName());
                 preparedStatement.setString(5, "null");
 
+                System.out.println(preparedStatement.toString());
+
                 var rs = preparedStatement.executeUpdate();
+                size++;
             }
-        } catch (Exception e) {
+        } catch (java.sql.SQLException e) {
             throw new RuntimeException(e);
         }
-
         return newId;
     }
 
@@ -115,26 +120,27 @@ public class DatabaseGameDAO implements GameDAO {
             String addStatement = "SELECT whiteUsername, blackUsername, gameName, game FROM game WHERE gameID = ?";
             try (var preparedStatement = conn.prepareStatement(addStatement)) {
                 preparedStatement.setInt(1, gameID);
-
+                System.out.println(preparedStatement.toString());
                 var rs = preparedStatement.executeQuery();
-                rs.next();
-                String whiteUsername = rs.getString(1);
-                String blackUsername = rs.getString(2);
-                String gameName = rs.getString(3);
-                String chessGameString = rs.getString(4);
+                if (rs.next()) {
 
-                ChessGame game = null;
-                if (!chessGameString.equals("null")){
-                    game = new ChessGame(chessGameString);
+                    String whiteUsername = rs.getString(1);
+                    String blackUsername = rs.getString(2);
+                    String gameName = rs.getString(3);
+                    String chessGameString = rs.getString(4);
+
+                    ChessGame game = null;
+                    if (!chessGameString.equals("null")) {
+                        game = new ChessGame(chessGameString);
+                    }
+
+
+                    //Unblank the chess game
+                    return new GameData(gameID, whiteUsername, blackUsername, gameName, game);
                 }
-
-
-                //Unblank the chess game
-                return new GameData(gameID, whiteUsername, blackUsername, gameName, game);
-
-                //throw new DataAccessException("No game with that ID");
+                throw new DataAccessException("No game with that ID");
             }
-        } catch (Exception e) {
+        } catch (java.sql.SQLException e) {
             throw new RuntimeException(e);
         }
 
@@ -142,16 +148,22 @@ public class DatabaseGameDAO implements GameDAO {
 
     public void updateGame(int gameID, GameData newGame) throws DataAccessException{
         try (var conn = DatabaseManager.getConnection()) {
-            String addStatement = "UPDATE game SET whiteUsername = ?, blackUsername = ?, gameName = ?, game = ?";
+            String addStatement = "UPDATE game SET whiteUsername = ?, blackUsername = ?, gameName = ?, game = ? where gameID = ?";
             try (var preparedStatement = conn.prepareStatement(addStatement)) {
                 preparedStatement.setString(1, newGame.whiteUsername());
                 preparedStatement.setString(2, newGame.blackUsername());
                 preparedStatement.setString(3, newGame.gameName());
+
+
+
+                System.out.println(preparedStatement.toString());
                 if (newGame.game() == null){
                     preparedStatement.setString(4, "null");
                 }else {
                     preparedStatement.setString(4, newGame.game().toString());
                 }
+
+                preparedStatement.setInt(5, gameID);
                 var rs = preparedStatement.executeUpdate();
             }
         } catch (Exception e) {

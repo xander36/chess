@@ -61,6 +61,7 @@ public class GameHandler {
 
         MakeGameRequest request = new MakeGameRequest(authToken, gameName);
 
+
         try {
             MakeGameResult result = gameService.makeGame(request);
 
@@ -69,10 +70,9 @@ public class GameHandler {
             return String.format("{\"gameID\": \"%d\"}", id);
 
         }catch (DataAccessException e){
-            if (e.toString().contains("Invalid Authorization")){
+            if (e.toString().contains("Invalid Authorization") || e.toString().contains("No matching auth")){
                 res.status(401);
                 return "{ \"message\": \"Error: unauthorized\" }";
-
             }
         }
         res.status(500);
@@ -95,7 +95,7 @@ public class GameHandler {
             res.status(200);
             return "{}";
         } catch (DataAccessException e){
-            if (e.toString().contains("Invalid Authorization")){
+            if (e.toString().contains("Invalid Authorization") || e.toString().contains("No matching auth")){
                 res.status(401);
                 return "{\"message\": \"Error: unauthorized\"}";
             }

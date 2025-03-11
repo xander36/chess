@@ -32,7 +32,6 @@ public class DatabaseUserDAO implements UserDAO {
                 System.out.println("connection problem");
             }
         } catch (DataAccessException e) {
-            System.out.println(e.toString());
             System.out.println("Database connection had a problem");
         }
     }
@@ -48,7 +47,6 @@ public class DatabaseUserDAO implements UserDAO {
                 } else {
                     String password = rs.getString(2);
                     String email = rs.getString(3);
-                    System.out.println(username);
                     return new UserData(username, password, email);
                 }
 

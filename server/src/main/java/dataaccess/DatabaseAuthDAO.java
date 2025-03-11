@@ -1,5 +1,6 @@
 package dataaccess;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 
@@ -45,7 +46,6 @@ public class DatabaseAuthDAO implements AuthDAO {
                 preparedStatement.setString(2, data.authToken());
 
                 var rs = preparedStatement.executeUpdate();
-                System.out.println(rs);
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -60,17 +60,16 @@ public class DatabaseAuthDAO implements AuthDAO {
 
                 var rs = preparedStatement.executeQuery();
                 if (!rs.next()) {
-                    throw new DataAccessException("No user with that name");
+                    throw new DataAccessException("No matching auth");
                 } else {
                     String username = rs.getString(1);
-                    System.out.println(username);
                     return new AuthData(username, token);
                 }
 
 
             }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (SQLException e) {
+            throw new DataAccessException("empty?");
         }
     }
 
@@ -94,14 +93,7 @@ public class DatabaseAuthDAO implements AuthDAO {
                 preparedStatement.setString(2, data.authToken());
 
                 var rs = preparedStatement.executeUpdate();
-                /*
-                String username = rs.getString(1);
-                System.out.println(username);
 
-                if (username == null){
-                    System.out.println("Cant get it out");
-                }
-                 */
             }
         } catch (Exception e) {
             throw new RuntimeException(e);

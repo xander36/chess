@@ -88,7 +88,6 @@ public class UserHandler {
             userService.logout(new LogoutRequest(authToken));
             res.status(200);
             return "{}";
-
         } catch (DataAccessException e) {
             res.status(401);
             return "{ \"message\": \"Error: unauthorized\" }";
