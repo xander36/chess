@@ -25,6 +25,8 @@ public class DatabaseAuthDAO implements AuthDAO {
                 for (String statementSQL : creationSQL) {
                     try (var preparedStatement = conn.prepareStatement(statementSQL)) {
                         preparedStatement.executeUpdate();
+
+
                     }
                 }
             } catch(Exception e){
@@ -57,14 +59,14 @@ public class DatabaseAuthDAO implements AuthDAO {
                 preparedStatement.setString(1, token);
 
                 var rs = preparedStatement.executeQuery();
-                rs.next();
-                String username = rs.getString(1);
-
-                if (username == null){
-                    System.out.println("Cant get it out");
+                if (!rs.next()) {
+                    throw new DataAccessException("No user with that name");
+                } else {
+                    String username = rs.getString(1);
+                    System.out.println(username);
+                    return new AuthData(username, token);
                 }
 
-                return new AuthData(username, token);
 
             }
         } catch (Exception e) {
@@ -86,7 +88,7 @@ public class DatabaseAuthDAO implements AuthDAO {
 
     public void deleteAuth(AuthData data){
         try (var conn = DatabaseManager.getConnection()) {
-            String addStatement = "DELETE FROM auth WHERE username = ?, authData = ?";
+            String addStatement = "DELETE FROM auth WHERE username = ? AND authToken = ?";
             try (var preparedStatement = conn.prepareStatement(addStatement)) {
                 preparedStatement.setString(1, data.username());
                 preparedStatement.setString(2, data.authToken());

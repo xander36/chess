@@ -2,6 +2,7 @@ package service;
 
 import dataaccess.*;
 import org.junit.jupiter.api.*;
+import org.mindrot.jbcrypt.BCrypt;
 
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -60,7 +61,7 @@ public class ServiceTests {
                 //Use the DAO to see if the user was added
                 UserData user = userAccess.getUser("user");
                 Assertions.assertEquals("user", user.username());
-                Assertions.assertEquals("password", user.password());
+                Assertions.assertTrue(BCrypt.checkpw("password", user.password()));
                 Assertions.assertEquals("address@gmail.com", user.email());
             } catch (DataAccessException e) {
                 //If for some reason accessing the DAO gives an error, fail an assertion

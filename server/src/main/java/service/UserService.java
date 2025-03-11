@@ -42,6 +42,7 @@ public class UserService {
 
             throw new CredentialsException("username taken");
         } catch (DataAccessException e){
+            System.out.println("storing password " + password);
             UserData newUser = new UserData(username, password, email);
             userAccess.createUser(newUser);
 
@@ -61,10 +62,8 @@ public class UserService {
         try {
             UserData existingUser = userAccess.getUser(username);
 
-            System.out.println("check plz");
-            System.out.println(password);
+            System.out.println("Database is storing the following");
             System.out.println(existingUser.password());
-            System.out.println(BCrypt.hashpw(password, gensalt()));
             if (!BCrypt.checkpw(password, existingUser.password())) {
                 throw new CredentialsException("Incorrect Password");
             }

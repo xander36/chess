@@ -65,7 +65,7 @@ public class DatabaseUserDAO implements UserDAO {
             String addStatement = "INSERT INTO user (username, password, email) VALUES (?, ?, ?)";
             try (var preparedStatement = conn.prepareStatement(addStatement)) {
                 preparedStatement.setString(1, user.username());
-                preparedStatement.setString(2, BCrypt.hashpw(user.password(), BCrypt.gensalt()));
+                preparedStatement.setString(2, user.password());
                 preparedStatement.setString(3, user.email());
 
                 var rs = preparedStatement.executeUpdate();
