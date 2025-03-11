@@ -42,7 +42,7 @@ public class DatabaseAuthDAO implements AuthDAO {
                 preparedStatement.setString(1, data.username());
                 preparedStatement.setString(2, data.authToken());
 
-                var rs = preparedStatement.executeQuery();
+                var rs = preparedStatement.executeUpdate();
                 System.out.println(rs);
             }
         } catch (Exception e) {
@@ -52,13 +52,13 @@ public class DatabaseAuthDAO implements AuthDAO {
 
     public AuthData getAuth(String token) throws DataAccessException{
         try (var conn = DatabaseManager.getConnection()) {
-            String addStatement = "SELECT username FROM auth WHERE authData = ?";
+            String addStatement = "SELECT username FROM auth WHERE authToken = ?";
             try (var preparedStatement = conn.prepareStatement(addStatement)) {
                 preparedStatement.setString(1, token);
 
                 var rs = preparedStatement.executeQuery();
+                rs.next();
                 String username = rs.getString(1);
-                System.out.println(username);
 
                 if (username == null){
                     System.out.println("Cant get it out");
@@ -77,7 +77,7 @@ public class DatabaseAuthDAO implements AuthDAO {
             String addStatement = "TRUNCATE TABLE auth";
             try (var preparedStatement = conn.prepareStatement(addStatement)) {
 
-                var rs = preparedStatement.executeQuery();
+                var rs = preparedStatement.executeUpdate();
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -91,7 +91,7 @@ public class DatabaseAuthDAO implements AuthDAO {
                 preparedStatement.setString(1, data.username());
                 preparedStatement.setString(2, data.authToken());
 
-                var rs = preparedStatement.executeQuery();
+                var rs = preparedStatement.executeUpdate();
                 /*
                 String username = rs.getString(1);
                 System.out.println(username);

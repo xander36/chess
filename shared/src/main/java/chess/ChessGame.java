@@ -20,6 +20,17 @@ public class ChessGame {
         board.resetBoard();
     }
 
+    public ChessGame(String representString){
+        if (representString.startsWith("BLACK")){
+            this.turn = TeamColor.BLACK;
+        }else{
+            this.turn = TeamColor.WHITE;
+        }
+        this.board = new ChessBoard(representString.substring(6));
+    }
+
+
+
     /**
      * @return Which team's turn it is
      */
@@ -247,5 +258,10 @@ public class ChessGame {
      */
     public ChessBoard getBoard() {
         return this.board;
+    }
+
+    @Override
+    public String toString() {
+        return turn + "\n" + board;
     }
 }

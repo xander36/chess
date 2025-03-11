@@ -47,9 +47,6 @@ public class UserHandler {
                 res.status(403);
                 return "{ \"message\": \"Error: already taken\" }";
             }
-        } catch (DataAccessException e){
-            System.out.println("oh no");
-            System.out.println(e.toString());
         }
 
         res.status(400);

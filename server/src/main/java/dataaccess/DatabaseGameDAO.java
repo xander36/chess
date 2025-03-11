@@ -12,16 +12,15 @@ public class DatabaseGameDAO implements GameDAO {
         String[] creationSQL = {
                 """
                 CREATE TABLE IF NOT EXISTS game (
-                  `id` int NOT NULL AUTO_INCREMENT,
-                  `gameID` int NOT NULL,
-                  `whiteUsername` VARCHAR(256),
-                  `blackUsername` VARCHAR(256),
-                  `gameName` VARCHAR(256) NOT NULL,
-                  'game' VARCHAR(256) NOT NULL,
-                   PRIMARY KEY (`id`),
-                   INDEX(gameID),
-                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
- 
+                    `id` int NOT NULL AUTO_INCREMENT,
+                    `gameID` int NOT NULL,
+                    `whiteUsername` VARCHAR(256),
+                    `blackUsername` VARCHAR(256),
+                    `gameName` VARCHAR(256) NOT NULL,
+                    `game` VARCHAR(256),
+                    PRIMARY KEY (`id`),
+                    INDEX(gameID)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
                 """
         };
         //int gameID, String whiteUsername, String blackUsername, String gameName, ChessGame game
@@ -34,7 +33,8 @@ public class DatabaseGameDAO implements GameDAO {
                     }
                 }
             } catch(Exception e){
-                System.out.println("connection problem");
+                System.out.println(e.toString());
+                System.out.println("game had connection problem");
             }
         } catch (DataAccessException e) {
             System.out.println("Database connection had a problem");
@@ -46,7 +46,7 @@ public class DatabaseGameDAO implements GameDAO {
             String addStatement = "TRUNCATE TABLE game";
             try (var preparedStatement = conn.prepareStatement(addStatement)) {
 
-                var rs = preparedStatement.executeQuery();
+                var rs = preparedStatement.executeUpdate();
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -57,12 +57,28 @@ public class DatabaseGameDAO implements GameDAO {
         ArrayList<String> outList = new ArrayList<String>();
 
         try (var conn = DatabaseManager.getConnection()) {
-            String addStatement = "SELECT username FROM auth";
+            String addStatement = "SELECT gameID, whiteUsername, blackUsername, gameName, game FROM game";
             try (var preparedStatement = conn.prepareStatement(addStatement)) {
 
                 var rs = preparedStatement.executeQuery();
-                System.out.println(rs);
+                while (rs.next()) {
+                    int gameID = rs.getInt(1);
+                    String whiteUsername = rs.getString(2);
+                    String blackUsername = rs.getString(3);
+                    String gameName = rs.getString(4);
+                    String chessGameString = rs.getString(5);
 
+                    ChessGame gameObj = null;
+
+                    if (chessGameString != null && !chessGameString.equals("null")){
+                        gameObj = new ChessGame(chessGameString);
+                    }
+
+                    GameData game = new GameData(gameID, whiteUsername, blackUsername, gameName, gameObj);
+
+                    outList.add(String.format("{\"gameID\": %s, \"whiteUsername\": %s, \"blackUsername\": %s, \"gameName\": \"%s\"}",
+                            game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName()));
+                }
 
             }
         } catch (Exception e) {
@@ -80,13 +96,12 @@ public class DatabaseGameDAO implements GameDAO {
             String addStatement = "INSERT INTO game (gameID, whiteUsername, blackUsername, gameName, game) VALUES (?, ?, ?, ?, ?)";
             try (var preparedStatement = conn.prepareStatement(addStatement)) {
                 preparedStatement.setInt(1, newGame.gameID());
-                preparedStatement.setString(2, newGame.whiteUsername());
-                preparedStatement.setString(3, newGame.whiteUsername());
+                preparedStatement.setString(2,null);
+                preparedStatement.setString(3, null);
                 preparedStatement.setString(4, newGame.gameName());
-                preparedStatement.setString(5, newGame.game().toString());
+                preparedStatement.setString(5, "null");
 
-                var rs = preparedStatement.executeQuery();
-                System.out.println(rs);
+                var rs = preparedStatement.executeUpdate();
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -97,18 +112,25 @@ public class DatabaseGameDAO implements GameDAO {
 
     public GameData getGame(int gameID) throws DataAccessException{
         try (var conn = DatabaseManager.getConnection()) {
-            String addStatement = "SELECT username FROM auth WHERE gameID = ?";
+            String addStatement = "SELECT whiteUsername, blackUsername, gameName, game FROM game WHERE gameID = ?";
             try (var preparedStatement = conn.prepareStatement(addStatement)) {
                 preparedStatement.setInt(1, gameID);
 
                 var rs = preparedStatement.executeQuery();
-                String whiteUsername = rs.getString(2);
-                String blackUsername = rs.getString(3);
-                String gameName = rs.getString(4);
-                String chessGame = rs.getString(5);
+                rs.next();
+                String whiteUsername = rs.getString(1);
+                String blackUsername = rs.getString(2);
+                String gameName = rs.getString(3);
+                String chessGameString = rs.getString(4);
+
+                ChessGame game = null;
+                if (!chessGameString.equals("null")){
+                    game = new ChessGame(chessGameString);
+                }
+
 
                 //Unblank the chess game
-                return new GameData(gameID, whiteUsername, blackUsername, gameName, new ChessGame());
+                return new GameData(gameID, whiteUsername, blackUsername, gameName, game);
 
                 //throw new DataAccessException("No game with that ID");
             }
@@ -119,17 +141,18 @@ public class DatabaseGameDAO implements GameDAO {
     }
 
     public void updateGame(int gameID, GameData newGame) throws DataAccessException{
-
         try (var conn = DatabaseManager.getConnection()) {
-            String addStatement = "UPDATE game SET whiteUsername = ?, blackUsername = ?, gameName = ?, game = ?)";
+            String addStatement = "UPDATE game SET whiteUsername = ?, blackUsername = ?, gameName = ?, game = ?";
             try (var preparedStatement = conn.prepareStatement(addStatement)) {
-                preparedStatement.setString(2, newGame.whiteUsername());
-                preparedStatement.setString(3, newGame.whiteUsername());
-                preparedStatement.setString(4, newGame.gameName());
-                preparedStatement.setString(5, newGame.game().toString());
-
-                var rs = preparedStatement.executeQuery();
-                System.out.println(rs);
+                preparedStatement.setString(1, newGame.whiteUsername());
+                preparedStatement.setString(2, newGame.blackUsername());
+                preparedStatement.setString(3, newGame.gameName());
+                if (newGame.game() == null){
+                    preparedStatement.setString(4, "null");
+                }else {
+                    preparedStatement.setString(4, newGame.game().toString());
+                }
+                var rs = preparedStatement.executeUpdate();
             }
         } catch (Exception e) {
             throw new RuntimeException(e);

@@ -31,6 +31,43 @@ public class ChessBoard {
         }
     }
 
+    public ChessBoard (String representString){
+        System.out.println("board");
+        System.out.println(representString);
+        String[] rows = representString.split("\n");
+        contents = new ChessPiece[8][8];
+        for (int i = 0; i < 8; i++){
+            String row = rows[i];
+            System.out.println("Row: " + row);
+            ChessPiece[] newRow = new ChessPiece[8];
+            for (int j = 0; j < 8; j++){
+                ChessGame.TeamColor team = ChessGame.TeamColor.BLACK;
+                char posChar = row.charAt(j);
+                ChessPiece newPiece = null;
+                if (Character.isUpperCase(posChar)){
+                    team = ChessGame.TeamColor.WHITE;
+                }
+
+                if (posChar == 'K' || posChar == 'k'){
+                    newPiece = new ChessPiece(team, ChessPiece.PieceType.KING);
+                } else if (posChar == 'Q' || posChar == 'q') {
+                    newPiece = new ChessPiece(team, ChessPiece.PieceType.QUEEN);
+                } else if (posChar == 'B' || posChar == 'b') {
+                    newPiece = new ChessPiece(team, ChessPiece.PieceType.BISHOP);
+                }else if (posChar == 'N' || posChar == 'n') {
+                    newPiece = new ChessPiece(team, ChessPiece.PieceType.KNIGHT);
+                }else if (posChar == 'R' || posChar == 'r') {
+                    newPiece = new ChessPiece(team, ChessPiece.PieceType.ROOK);
+                }else if (posChar == 'P' || posChar == 'p') {
+                    newPiece = new ChessPiece(team, ChessPiece.PieceType.PAWN);
+                }
+
+                newRow[j] = newPiece;
+            }
+            contents[i] = newRow;
+        }
+    }
+
     /**
      * Adds a chess piece to the chessboard
      *

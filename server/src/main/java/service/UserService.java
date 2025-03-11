@@ -1,9 +1,14 @@
 package service;
 
 import dataaccess.*;
+import org.mindrot.jbcrypt.BCrypt;
 import server.CredentialsException;
 
+import javax.xml.crypto.Data;
 import java.util.UUID;
+
+import static org.mindrot.jbcrypt.BCrypt.gensalt;
+import static org.mindrot.jbcrypt.BCrypt.hashpw;
 
 public class UserService {
 
@@ -17,12 +22,18 @@ public class UserService {
         this.gameAccess = gameAccess;
     }
 
-    public RegisterResult register(RegisterRequest registerRequest) throws CredentialsException, DataAccessException{
+    public RegisterResult register(RegisterRequest registerRequest) throws CredentialsException{
+        System.out.println("Service wants to register");
         String username = registerRequest.username();
-        String password = registerRequest.password();
+        String password = BCrypt.hashpw(registerRequest.password(), BCrypt.gensalt());
         String email = registerRequest.email();
 
-        if (password == null){
+        System.out.println(registerRequest.password());
+        System.out.println("maps to");
+        System.out.println(password);
+
+
+        if (registerRequest.password() == null){
             throw new CredentialsException("no authToken");
         }
 
@@ -30,10 +41,7 @@ public class UserService {
             UserData existingUser = userAccess.getUser(username);
 
             throw new CredentialsException("username taken");
-
-        }
-        catch (DataAccessException e){
-
+        } catch (DataAccessException e){
             UserData newUser = new UserData(username, password, email);
             userAccess.createUser(newUser);
 
@@ -53,7 +61,11 @@ public class UserService {
         try {
             UserData existingUser = userAccess.getUser(username);
 
-            if (!existingUser.password().equals(password)){
+            System.out.println("check plz");
+            System.out.println(password);
+            System.out.println(existingUser.password());
+            System.out.println(BCrypt.hashpw(password, gensalt()));
+            if (!BCrypt.checkpw(password, existingUser.password())) {
                 throw new CredentialsException("Incorrect Password");
             }
 
