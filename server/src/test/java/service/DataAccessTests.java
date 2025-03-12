@@ -145,8 +145,13 @@ public class DataAccessTests {
     @Test
     @Order(7)
     public void makeGameTestFail(){
-        //How to fail
-        Assertions.fail();
+        reset();
+        try {
+            gameAccess.makeGame("");
+            Assertions.fail();
+        }catch(Exception e){
+            //Trying to make a blank-named game should throw an error
+        }
     }
 
     @Test
