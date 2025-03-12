@@ -89,8 +89,7 @@ public class DatabaseAuthDAO implements AuthDAO {
         }
     }
 
-    public void deleteAuth(AuthData data){
-        //if thats not there fail
+    public void deleteAuth(AuthData data) throws DataAccessException{
 
         try (var conn = DatabaseManager.getConnection()) {
             String addStatement = "DELETE FROM auth WHERE username = ? AND authToken = ?";
@@ -100,8 +99,12 @@ public class DatabaseAuthDAO implements AuthDAO {
 
                 var rs = preparedStatement.executeUpdate();
 
+                if (rs == 0){
+                    throw new DataAccessException("attempted to delete something that doesnt exist");
+                }
+
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }

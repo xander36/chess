@@ -341,7 +341,21 @@ public class DataAccessTests {
     }
     @Test
     @Order(20)
-    public void deleteAuthTestFail(){Assertions.fail();}
+    public void deleteAuthTestFail(){
+        reset();
+
+        String token = UUID.randomUUID().toString();
+        AuthData auth = new AuthData("mr fun", token);
+        try {
+
+            authAccess.deleteAuth(auth);
+
+            Assertions.fail();
+        } catch (Exception e){
+            //If attempting to delete authdata that doesnt exist throws an error
+            //The code is doing its job
+        }
+    }
     @Test
     @Order(21)
     public void authClearTestPass(){
