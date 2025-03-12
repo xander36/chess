@@ -14,13 +14,12 @@ public class DatabaseGameDAO implements GameDAO {
         String[] creationSQL = {
                 """
                 CREATE TABLE IF NOT EXISTS game (
-                    `id` int NOT NULL AUTO_INCREMENT,
-                    `gameID` int NOT NULL,
+                    `gameID` int NOT NULL AUTO_INCREMENT,
                     `whiteUsername` VARCHAR(256),
                     `blackUsername` VARCHAR(256),
                     `gameName` VARCHAR(256) NOT NULL,
                     `game` VARCHAR(256),
-                    PRIMARY KEY (`id`),
+                    PRIMARY KEY (`gameID`),
                     INDEX(gameID)
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
                 """
@@ -153,8 +152,6 @@ public class DatabaseGameDAO implements GameDAO {
                 preparedStatement.setString(1, newGame.whiteUsername());
                 preparedStatement.setString(2, newGame.blackUsername());
                 preparedStatement.setString(3, newGame.gameName());
-
-
 
                 System.out.println(preparedStatement.toString());
                 if (newGame.game() == null){
