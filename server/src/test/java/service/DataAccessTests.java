@@ -295,7 +295,23 @@ public class DataAccessTests {
     }
     @Test
     @Order(16)
-    public void createAuthTestFail(){Assertions.fail();}
+    public void createAuthTestFail(){
+        reset();
+
+        String token = UUID.randomUUID().toString();
+        AuthData auth = new AuthData("mr fun", token);
+        try {
+            //try tp register the same auth twice
+            authAccess.createAuth(auth);
+            authAccess.createAuth(auth);
+
+            Assertions.fail();
+        } catch (Exception e){
+            //Double registration should end in failure,
+            //but thrwoing an error and catching out should pass the test
+        }
+
+    }
     @Test
     @Order(17)
     public void getAuthTestPass(){

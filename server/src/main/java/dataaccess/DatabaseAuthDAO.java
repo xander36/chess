@@ -38,8 +38,18 @@ public class DatabaseAuthDAO implements AuthDAO {
         }
     }
 
-    public void createAuth(AuthData data){
-        //duplicate row
+    public void createAuth(AuthData data) throws DataAccessException{
+        boolean tokenAlreadyExists = false;
+        try{
+            AuthData possibleDuplicate = getAuth(data.authToken());
+            tokenAlreadyExists = true;
+        } catch (DataAccessException e) {
+
+        }
+
+        if (tokenAlreadyExists){
+            throw new DataAccessException("authToken already registered");
+        }
 
         try (var conn = DatabaseManager.getConnection()) {
             String addStatement = "INSERT INTO auth (username, authToken) VALUES (?, ?)";
@@ -55,7 +65,6 @@ public class DatabaseAuthDAO implements AuthDAO {
     }
 
     public AuthData getAuth(String token) throws DataAccessException{
-        //in authtoken not there fail
 
         try (var conn = DatabaseManager.getConnection()) {
             String addStatement = "SELECT username FROM auth WHERE authToken = ?";

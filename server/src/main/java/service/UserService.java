@@ -61,8 +61,11 @@ public class UserService {
         }
 
         AuthData newAuth = new AuthData(username, UUID.randomUUID().toString());
-        authAccess.createAuth(newAuth);
-
+        try {
+            authAccess.createAuth(newAuth);
+        } catch (DataAccessException e) {
+            throw new CredentialsException("duplicate authToken");
+        }
         return new LoginResult(newAuth.username(), newAuth.authToken());
     }
 
