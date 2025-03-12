@@ -39,6 +39,8 @@ public class DatabaseAuthDAO implements AuthDAO {
     }
 
     public void createAuth(AuthData data){
+        //duplicate row
+
         try (var conn = DatabaseManager.getConnection()) {
             String addStatement = "INSERT INTO auth (username, authToken) VALUES (?, ?)";
             try (var preparedStatement = conn.prepareStatement(addStatement)) {
@@ -53,6 +55,8 @@ public class DatabaseAuthDAO implements AuthDAO {
     }
 
     public AuthData getAuth(String token) throws DataAccessException{
+        //in authtoken not there fail
+
         try (var conn = DatabaseManager.getConnection()) {
             String addStatement = "SELECT username FROM auth WHERE authToken = ?";
             try (var preparedStatement = conn.prepareStatement(addStatement)) {
@@ -86,6 +90,8 @@ public class DatabaseAuthDAO implements AuthDAO {
     }
 
     public void deleteAuth(AuthData data){
+        //if thats not there fail
+
         try (var conn = DatabaseManager.getConnection()) {
             String addStatement = "DELETE FROM auth WHERE username = ? AND authToken = ?";
             try (var preparedStatement = conn.prepareStatement(addStatement)) {

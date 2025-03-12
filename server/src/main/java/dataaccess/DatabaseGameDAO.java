@@ -55,6 +55,10 @@ public class DatabaseGameDAO implements GameDAO {
     }
 
     public ArrayList<String> listGames (String authToken) throws DataAccessException{
+        if(authToken.equals("")){
+            throw new DataAccessException("no authtoken");
+        }
+
         ArrayList<String> outList = new ArrayList<String>();
         try (var conn = DatabaseManager.getConnection()) {
             String addStatement = "SELECT gameID, whiteUsername, blackUsername, gameName, game FROM game";
@@ -90,6 +94,10 @@ public class DatabaseGameDAO implements GameDAO {
     }
 
     public int makeGame(String gameName) throws DataAccessException{
+        if (gameName.equals("")){
+            throw new DataAccessException("empty game name - invalid");
+        }
+
         int newId = size+1;
         System.out.println("Make number");
         System.out.println(newId);
