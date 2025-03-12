@@ -7,7 +7,7 @@ import java.util.ArrayList;
 public class DatabaseAuthDAO implements AuthDAO {
 
     public DatabaseAuthDAO(){
-        String[] creationSQL = {
+        String[] authCreationSQL = {
                 """
                 CREATE TABLE IF NOT EXISTS auth (
                   `id` int NOT NULL AUTO_INCREMENT,
@@ -23,11 +23,9 @@ public class DatabaseAuthDAO implements AuthDAO {
         try {
             DatabaseManager.createDatabase();
             try (var conn = DatabaseManager.getConnection()) {
-                for (String statementSQL : creationSQL) {
-                    try (var preparedStatement = conn.prepareStatement(statementSQL)) {
-                        preparedStatement.executeUpdate();
-
-
+                for (String statementSQL : authCreationSQL) {
+                    try (var preparedAuthCreationStatement = conn.prepareStatement(statementSQL)) {
+                        preparedAuthCreationStatement.executeUpdate();
                     }
                 }
             } catch(Exception e){

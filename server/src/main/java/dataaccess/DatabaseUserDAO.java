@@ -8,7 +8,7 @@ import java.util.ArrayList;
 public class DatabaseUserDAO implements UserDAO {
 
     public DatabaseUserDAO(){
-        String[] creationSQL = {
+        String[] userCreationSQL = {
                 """
                 CREATE TABLE IF NOT EXISTS user (
                   `username` VARCHAR(256) NOT NULL,
@@ -23,9 +23,9 @@ public class DatabaseUserDAO implements UserDAO {
         try {
             DatabaseManager.createDatabase();
             try (var conn = DatabaseManager.getConnection()) {
-                for (String statementSQL : creationSQL) {
-                    try (var preparedStatement = conn.prepareStatement(statementSQL)) {
-                        preparedStatement.executeUpdate();
+                for (String statementSQL : userCreationSQL) {
+                    try (var preparedUserCreationStatement = conn.prepareStatement(statementSQL)) {
+                        preparedUserCreationStatement.executeUpdate();
                     }
                 }
             } catch(Exception e){
