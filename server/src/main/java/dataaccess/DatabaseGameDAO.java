@@ -29,9 +29,9 @@ public class DatabaseGameDAO implements GameDAO {
             DatabaseManager.createDatabase();
             try (var conn = DatabaseManager.getConnection()) {
                 for (String statementSQL : creationSQL) {
-                    try (var preparedStatement = conn.prepareStatement(statementSQL)) {
-                        preparedStatement.executeUpdate();
-                    }
+                    var preparedStatement = conn.prepareStatement(statementSQL);
+                    preparedStatement.executeUpdate();
+
                 }
             } catch(Exception e){
                 //System.out.println("game had connection problem");
