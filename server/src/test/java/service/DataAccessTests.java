@@ -221,8 +221,19 @@ public class DataAccessTests {
     @Order(11)
     public void listGamesTestFail(){
         reset();
+        try {
 
-        Assertions.fail();
+
+            gameAccess.makeGame("fun game");
+            gameAccess.makeGame("another game");
+
+            ArrayList<String> gameList  = gameAccess.listGames("");
+
+            Assertions.fail();
+
+        }catch(Exception e){
+            //Attempting to get a game list without even trying to provide an authToken should fail
+        }
 
     }
 
