@@ -315,7 +315,22 @@ public class DataAccessTests {
     }
     @Test
     @Order(18)
-    public void getAuthTestFail(){Assertions.fail();}
+    public void getAuthTestFail(){
+        reset();
+
+        String token = UUID.randomUUID().toString();
+        AuthData auth = new AuthData("mr fun", token);
+        try {
+
+            AuthData retrieve = authAccess.getAuth(token);
+
+            Assertions.fail();
+
+        } catch (Exception e){
+            //The try block is supposed to fail - its trying to access an authdata that doesnt exist
+            //If this catch block executes and skips the fail, the code works
+        }
+    }
     @Test
     @Order(19)
     public void deleteAuthTestPass(){
