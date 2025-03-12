@@ -61,6 +61,7 @@ public class DatabaseGameDAO implements GameDAO {
             try (var preparedStatement = conn.prepareStatement(addStatement)) {
                 System.out.println(preparedStatement.toString());
                 var rs = preparedStatement.executeQuery();
+
                 while (rs.next()) {
                     int gameID = rs.getInt(1);
                     String whiteUsername = rs.getString(2);
@@ -106,6 +107,7 @@ public class DatabaseGameDAO implements GameDAO {
                 System.out.println(preparedStatement.toString());
 
                 var rs = preparedStatement.executeUpdate();
+
                 size++;
             }
         } catch (java.sql.SQLException e) {
@@ -162,6 +164,11 @@ public class DatabaseGameDAO implements GameDAO {
 
                 preparedStatement.setInt(5, gameID);
                 var rs = preparedStatement.executeUpdate();
+                System.out.println(rs);
+
+                if (rs == 0){
+                    throw new DataAccessException("Invalid update, no rows altered");
+                }
             }
         } catch (Exception e) {
             throw new RuntimeException(e);

@@ -106,11 +106,9 @@ public class DataAccessTests {
     @Order(5)
     public void userClearTestPass(){
         reset();
-
         try{
             userAccess.clear();
         }catch (Exception e){
-            System.out.println(e.toString());
             Assertions.fail();
         }
     }
@@ -148,6 +146,7 @@ public class DataAccessTests {
     @Order(7)
     public void makeGameTestFail(){
         //How to fail
+        Assertions.fail();
     }
 
     @Test
@@ -172,8 +171,6 @@ public class DataAccessTests {
             Assertions.assertNull(retrieve.whiteUsername());
             Assertions.assertNull(retrieve.blackUsername());
             Assertions.assertEquals(2, retrieve.gameID());
-
-
         }catch(Exception e){
             Assertions.fail();
         }
@@ -219,34 +216,60 @@ public class DataAccessTests {
     @Order(11)
     public void listGamesTestFail(){
         reset();
-        try {
-            UserData user = new UserData("Alex", "strongpassword", "arc@byu.edu");
-            userAccess.createUser(user);
-            AuthData data = new AuthData("Alex", UUID.randomUUID().toString());
-            authAccess.createAuth(data);
 
-            gameAccess.makeGame("fun game");
-            gameAccess.makeGame("another game");
+        Assertions.fail();
 
-            ArrayList<String> gameList  = gameAccess.listGames(data.authToken());
-
-        }catch(Exception e){
-            Assertions.fail();
-        }
     }
 
 
     @Test
     @Order(12)
-    public void updateGameTestPass(){Assertions.fail();}
+    public void updateGameTestPass(){
+        reset();
+        try {
+            gameAccess.makeGame("fun game");
+            GameData game = gameAccess.getGame(1);
+
+            game = new GameData(1, game.whiteUsername(), game.blackUsername(), "fun game with a cooler name", game.game());
+
+            gameAccess.updateGame(1, game);
+
+            GameData retrieve = gameAccess.getGame(1);
+
+            Assertions.assertEquals(game.gameID(), retrieve.gameID());
+            Assertions.assertEquals(game.whiteUsername(), retrieve.whiteUsername());
+            Assertions.assertEquals(game.blackUsername(), retrieve.blackUsername());
+            Assertions.assertEquals(game.gameName(), retrieve.gameName());
+            Assertions.assertEquals(game.game(), retrieve.game());
+
+        }catch(Exception e){
+            Assertions.fail();
+        }
+    }
     @Test
     @Order(13)
-    public void updateGameTestFail(){Assertions.fail();}
+    public void updateGameTestFail(){
+        reset();
+        try {
+            gameAccess.makeGame("fun game");
+            GameData game = gameAccess.getGame(1);
+
+            game = new GameData(1, game.whiteUsername(), game.blackUsername(), "fun game with a cooler name", game.game());
+
+            gameAccess.updateGame(2, game);
+
+            Assertions.fail();
+
+        }catch(Exception e){
+
+        }
+    }
     @Test
     @Order(14)
     public void gameClearTestPass(){
+        reset();
         try{
-            userAccess.clear();
+            gameAccess.clear();
         }catch (Exception e){
             Assertions.fail();
         }
@@ -255,25 +278,74 @@ public class DataAccessTests {
     //Auth
     @Test
     @Order(15)
-    public void createAuthTestPass(){Assertions.fail();}
+    public void createAuthTestPass(){
+        reset();
+
+        String token = UUID.randomUUID().toString();
+        AuthData auth = new AuthData("mr fun", token);
+        try {
+            authAccess.createAuth(auth);
+
+            AuthData retrieve = authAccess.getAuth(token);
+            Assertions.assertEquals(auth.username(), retrieve.username());
+            Assertions.assertEquals(auth.authToken(), retrieve.authToken());
+        } catch (Exception e){
+            Assertions.fail();
+        }
+    }
     @Test
     @Order(16)
     public void createAuthTestFail(){Assertions.fail();}
     @Test
     @Order(17)
-    public void getAuthTestPass(){Assertions.fail();}
+    public void getAuthTestPass(){
+        reset();
+
+        String token = UUID.randomUUID().toString();
+        AuthData auth = new AuthData("mr fun", token);
+        try {
+            authAccess.createAuth(auth);
+
+            AuthData retrieve = authAccess.getAuth(token);
+            Assertions.assertEquals(auth.username(), retrieve.username());
+            Assertions.assertEquals(auth.authToken(), retrieve.authToken());
+        } catch (Exception e){
+            Assertions.fail();
+        }
+    }
     @Test
     @Order(18)
     public void getAuthTestFail(){Assertions.fail();}
     @Test
     @Order(19)
-    public void deleteAuthTestPass(){Assertions.fail();}
+    public void deleteAuthTestPass(){
+        reset();
+
+        String token = UUID.randomUUID().toString();
+        AuthData auth = new AuthData("mr fun", token);
+        try {
+            authAccess.createAuth(auth);
+
+            authAccess.deleteAuth(auth);
+
+            try{
+                authAccess.getAuth(token);
+                Assertions.fail();
+            } catch (DataAccessException e) {
+                //If attempting to get the authdata after its been deleted throws an error,
+                //The code is doing its job
+            }
+        } catch (Exception e){
+            Assertions.fail();
+        }
+    }
     @Test
     @Order(20)
     public void deleteAuthTestFail(){Assertions.fail();}
     @Test
     @Order(21)
     public void authClearTestPass(){
+        reset();
         try{
             authAccess.clear();
         }catch (Exception e){
