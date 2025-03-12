@@ -34,14 +34,14 @@ public class DataAccessTests {
     public void createUserTestPass(){
         reset();
 
-        UserData user = new UserData("mr fun", "password", "lol@aol.com");
+        UserData userToCreate = new UserData("mr fun", "password", "lol@aol.com");
         try {
-            userAccess.createUser(user);
+            userAccess.createUser(userToCreate);
 
             UserData retrieve = userAccess.getUser("mr fun");
-            Assertions.assertEquals(user.username(), retrieve.username());
-            Assertions.assertEquals(user.password(), retrieve.password());
-            Assertions.assertEquals(user.email(), retrieve.email());
+            Assertions.assertEquals(userToCreate.username(), retrieve.username());
+            Assertions.assertEquals(userToCreate.password(), retrieve.password());
+            Assertions.assertEquals(userToCreate.email(), retrieve.email());
         } catch (Exception e){
             Assertions.fail();
         }
@@ -53,10 +53,10 @@ public class DataAccessTests {
         reset();
 
         try {
-            UserData user = new UserData("mr fun", "password", "lol@aol.com");
+            UserData originalUser = new UserData("mr fun", "password", "lol@aol.com");
             UserData repeatUser = new UserData("mr fun", "password1", "him@aol.com");
 
-            userAccess.createUser(user);
+            userAccess.createUser(originalUser);
             userAccess.createUser(repeatUser);
 
             Assertions.fail();
@@ -71,13 +71,14 @@ public class DataAccessTests {
     public void getUserTestPass(){
         reset();
 
-        UserData user = new UserData("mr fun", "password", "lol@aol.com");
+        UserData startUser = new UserData("mr fun", "password", "lol@aol.com");
         try {
-            userAccess.createUser(user);
+            userAccess.createUser(startUser);
+
             UserData retrieve = userAccess.getUser("mr fun");
-            Assertions.assertEquals(user.username(), retrieve.username());
-            Assertions.assertEquals(user.password(), retrieve.password());
-            Assertions.assertEquals(user.email(), retrieve.email());
+            Assertions.assertEquals(startUser.username(), retrieve.username());
+            Assertions.assertEquals(startUser.password(), retrieve.password());
+            Assertions.assertEquals(startUser.email(), retrieve.email());
         } catch (Exception e){
             System.out.println(e.toString());
             Assertions.fail();
@@ -159,20 +160,22 @@ public class DataAccessTests {
     public void getGameTestPass(){
         reset();
         try {
-            gameAccess.makeGame("fun game");
+
+            gameAccess.makeGame("first game");
 
             GameData retrieve = gameAccess.getGame(1);
 
-            Assertions.assertEquals("fun game", retrieve.gameName());
+            Assertions.assertEquals("first game", retrieve.gameName());
+
             Assertions.assertNull(retrieve.whiteUsername());
             Assertions.assertNull(retrieve.blackUsername());
             Assertions.assertEquals(1, retrieve.gameID());
 
-            gameAccess.makeGame("another game");
+            gameAccess.makeGame("second game");
 
             retrieve = gameAccess.getGame(2);
 
-            Assertions.assertEquals("another game", retrieve.gameName());
+            Assertions.assertEquals("second game", retrieve.gameName());
             Assertions.assertNull(retrieve.whiteUsername());
             Assertions.assertNull(retrieve.blackUsername());
             Assertions.assertEquals(2, retrieve.gameID());
@@ -298,13 +301,13 @@ public class DataAccessTests {
         reset();
 
         String token = UUID.randomUUID().toString();
-        AuthData auth = new AuthData("mr fun", token);
+        AuthData creationAuth = new AuthData("mr fun", token);
         try {
-            authAccess.createAuth(auth);
+            authAccess.createAuth(creationAuth);
 
             AuthData retrieve = authAccess.getAuth(token);
-            Assertions.assertEquals(auth.username(), retrieve.username());
-            Assertions.assertEquals(auth.authToken(), retrieve.authToken());
+            Assertions.assertEquals(creationAuth.username(), retrieve.username());
+            Assertions.assertEquals(creationAuth.authToken(), retrieve.authToken());
         } catch (Exception e){
             Assertions.fail();
         }
@@ -338,9 +341,9 @@ public class DataAccessTests {
         try {
             authAccess.createAuth(auth);
 
-            AuthData retrieve = authAccess.getAuth(token);
-            Assertions.assertEquals(auth.username(), retrieve.username());
-            Assertions.assertEquals(auth.authToken(), retrieve.authToken());
+            AuthData retrievedAuth = authAccess.getAuth(token);
+            Assertions.assertEquals(auth.username(), retrievedAuth.username());
+            Assertions.assertEquals(auth.authToken(), retrievedAuth.authToken());
         } catch (Exception e){
             Assertions.fail();
         }
