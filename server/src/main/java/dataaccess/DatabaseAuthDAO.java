@@ -24,9 +24,8 @@ public class DatabaseAuthDAO implements AuthDAO {
             DatabaseManager.createDatabase();
             try (var conn = DatabaseManager.getConnection()) {
                 for (String statementSQL : authCreationSQL) {
-                    try (var preparedAuthCreationStatement = conn.prepareStatement(statementSQL)) {
-                        preparedAuthCreationStatement.executeUpdate();
-                    }
+                    var preparedAuthCreationStatement = conn.prepareStatement(statementSQL);
+                    preparedAuthCreationStatement.executeUpdate();
                 }
             } catch(Exception e){
                 System.out.println("connection problem");
