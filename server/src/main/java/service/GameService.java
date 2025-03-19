@@ -1,10 +1,12 @@
 package service;
 
 import dataaccess.*;
+import request.JoinGameRequest;
+import request.ListRequest;
+import request.MakeGameRequest;
+import result.ListResult;
+import result.MakeGameResult;
 import server.ChessMatchException;
-import server.CredentialsException;
-
-import java.util.ArrayList;
 
 public class GameService {
 

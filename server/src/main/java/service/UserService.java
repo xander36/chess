@@ -2,13 +2,16 @@ package service;
 
 import dataaccess.*;
 import org.mindrot.jbcrypt.BCrypt;
+import request.LoginRequest;
+import request.LogoutRequest;
+import request.RegisterRequest;
+import result.LoginResult;
+import result.RegisterResult;
 import server.CredentialsException;
 
-import javax.xml.crypto.Data;
 import java.util.UUID;
 
 import static org.mindrot.jbcrypt.BCrypt.gensalt;
-import static org.mindrot.jbcrypt.BCrypt.hashpw;
 
 public class UserService {
 

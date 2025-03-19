@@ -1,4 +1,4 @@
-package service;
+package result;
 
 public record ClearResult(){
 

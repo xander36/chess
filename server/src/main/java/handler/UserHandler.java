@@ -1,12 +1,16 @@
 package handler;
 
 import dataaccess.*;
+import request.LoginRequest;
+import request.LogoutRequest;
+import request.RegisterRequest;
+import result.LoginResult;
+import result.RegisterResult;
 import server.*;
 import service.*;
 import spark.*;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 
 public class UserHandler {
 
