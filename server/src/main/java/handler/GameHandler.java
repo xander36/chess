@@ -59,7 +59,7 @@ public class GameHandler {
         res.type("application/json");
 
         String authToken = req.headers("Authorization");
-
+        System.out.println("handler claims to be authorized by the request's authToken " + authToken);
         JsonObject jsonObject = gson.fromJson(req.body(), JsonObject.class);
         String gameName = jsonObject.get("gameName").getAsString();
 

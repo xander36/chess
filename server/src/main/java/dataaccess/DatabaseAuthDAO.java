@@ -36,8 +36,10 @@ public class DatabaseAuthDAO implements AuthDAO {
     }
 
     public void createAuth(AuthData data) throws DataAccessException{
+        System.out.println("I have been asked to make Auth");
         boolean tokenAlreadyExists = false;
         try{
+            System.out.println("imma look for a duplcate");
             AuthData possibleDuplicate = getAuth(data.authToken());
             tokenAlreadyExists = true;
         } catch (DataAccessException e) {
@@ -55,6 +57,7 @@ public class DatabaseAuthDAO implements AuthDAO {
                 preparedStatement.setString(2, data.authToken());
 
                 var rs = preparedStatement.executeUpdate();
+                System.out.println("created successfully");
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -62,7 +65,7 @@ public class DatabaseAuthDAO implements AuthDAO {
     }
 
     public AuthData getAuth(String token) throws DataAccessException{
-
+        System.out.println("I have been asked to find " + token);
         try (var conn = DatabaseManager.getConnection()) {
             String addStatement = "SELECT username FROM auth WHERE authToken = ?";
             try (var preparedStatement = conn.prepareStatement(addStatement)) {

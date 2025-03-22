@@ -19,9 +19,8 @@ public class ServerFacadeException extends RuntimeException {
         return new Gson().toJson(Map.of("message", getMessage(), "status", statusCode));
     }
 
-    public static ServerFacadeException fromJson(InputStream stream) {
+    public static ServerFacadeException fromJson(int status, InputStream stream) {
         var map = new Gson().fromJson(new InputStreamReader(stream), HashMap.class);
-        var status = ((Double)map.get("status")).intValue();
         String message = map.get("message").toString();
         return new ServerFacadeException(status, message);
     }

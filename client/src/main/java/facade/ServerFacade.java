@@ -17,46 +17,50 @@ public class ServerFacade {
 
     public RegisterResult register(RegisterRequest registerRequest){
         var path = "/user";
-        return this.makeRequest("POST", path, registerRequest, RegisterResult.class);
+        return this.makeRequest("POST", path, registerRequest, null, RegisterResult.class);
     }
 
     public LoginResult login(LoginRequest loginRequest){
         var path = "/session";
-        return this.makeRequest("POST", path, loginRequest, LoginResult.class);
+        return this.makeRequest("POST", path, loginRequest, null, LoginResult.class);
     }
 
     public void logout(LogoutRequest logoutRequest){
         var path = "/session";
-        this.makeRequest("DELETE", path, logoutRequest, null);
+        this.makeRequest("DELETE", path, logoutRequest, logoutRequest.authToken(), null);
     }
 
 
     public ListResult listGames(ListRequest listRequest) {
         var path = "/game";
-        return this.makeRequest("GET", path, listRequest, ListResult.class);
+        return this.makeRequest("GET", path, listRequest, listRequest.authToken(), ListResult.class);
     }
 
     public MakeGameResult makeGame(MakeGameRequest makeGameRequest){
         var path = "/game";
-        return this.makeRequest("POST", path, makeGameRequest, MakeGameResult.class);
+        return this.makeRequest("POST", path, makeGameRequest, makeGameRequest.authToken(), MakeGameResult.class);
     }
 
     public void joinGame(JoinGameRequest joinGameRequest){
         var path = "/game";
-        this.makeRequest("PUT", path, joinGameRequest, null);
+        this.makeRequest("PUT", path, joinGameRequest, joinGameRequest.authToken(), null);
     }
 
     public ClearResult clear(ClearRequest clearRequest){
         var path = "/db";
-        return this.makeRequest("DELETE", path, clearRequest, ClearResult.class);
+        return this.makeRequest("DELETE", path, clearRequest, null, ClearResult.class);
     }
 
-    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws ServerFacadeException{
+    private <T> T makeRequest(String method, String path, Object request, String authHeader, Class<T> responseClass) throws ServerFacadeException{
         try {
             URL url = (new URI(this.url + path)).toURL();
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
             http.setRequestMethod(method);
             http.setDoOutput(true);
+
+            if (authHeader != null){
+                http.setRequestProperty("Authorization", authHeader);
+            }
 
             writeBody(request, http);
             http.connect();
@@ -93,13 +97,13 @@ public class ServerFacade {
     }
 
     private void throwIfNotSuccessful(HttpURLConnection http) throws IOException, ServerFacadeException {
-        System.out.println("serverfcade issues check");
+        System.out.println("serverside issues check");
         var status = http.getResponseCode();
         System.out.println(status);
         if (!(status/100 == 2)) {
             try (InputStream respErr = http.getErrorStream()) {
                 if (respErr != null) {
-                    throw ServerFacadeException.fromJson(respErr);
+                    throw ServerFacadeException.fromJson(status, respErr);
                 }
             }
 

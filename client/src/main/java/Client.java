@@ -57,12 +57,13 @@ public class Client {
                 }
             } else if (status.equals("LOGGED_IN")) {
                 if (input.startsWith("create")) {
+                    System.out.println("creation process begins ");
                     String[] parts = input.split(" ");
                     if (parts.length != 2) {
                         return "Invalid arguments";
                     } else {
 
-                        System.out.println(authToken);
+                        System.out.println("I authorize my clreation with the system authroizer " + authToken);
                         System.out.println(parts[1]);
 
                         MakeGameRequest req = new MakeGameRequest(authToken, parts[1]);
@@ -93,7 +94,14 @@ public class Client {
                     } else if (!(parts[2].equals("WHITE") || parts[2].equals("BLACK"))){
                         return "Invalid team name. try \"WHITE\" or \"BLACK\"";
                     } else {
-                        JoinGameRequest req = new JoinGameRequest(authToken, parts[2], Integer.parseInt(parts[1]));
+                        int gameID = -1;
+                        try{
+                            gameID = Integer.parseInt(parts[1]);
+                        } catch (NumberFormatException e){
+                            return "Game ID is not a number... did you put the name instead?";
+                        }
+
+                        JoinGameRequest req = new JoinGameRequest(authToken, parts[2], gameID);
                         serverFacade.joinGame(req);
 
                         game = getGameWithID(Integer.parseInt(parts[1]));
