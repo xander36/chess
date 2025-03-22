@@ -16,7 +16,7 @@ public class Main {
         while (!result.equals("<QUIT>")){
             result = client.eval(scan.nextLine());
             System.out.println(result);
-            System.out.println(client.getPrompt());
+            System.out.print(client.getPrompt());
         }
 
         System.out.println();
