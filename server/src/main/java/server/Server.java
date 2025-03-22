@@ -41,9 +41,9 @@ public class Server {
 
         Spark.delete("/session", (req, res) -> {return userHandler.logout(req, res);});
 
-        Spark.get("/game", (req, res) -> {return gameHandler.listGames(req, res);});
+        Spark.get("/game", (req, res) -> {System.out.println("I am telling you I got a GET request"); return gameHandler.listGames(req, res);});
 
-        Spark.post("/game", (req, res) -> {return gameHandler.makeGame(req, res);});
+        Spark.post("/game", (req, res) -> {System.out.println("I am telling you I got a POST request"); return gameHandler.makeGame(req, res);});
 
         Spark.put("/game", (req, res) -> {return gameHandler.joinGame(req, res);});
 

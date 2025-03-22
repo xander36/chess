@@ -73,7 +73,11 @@ public class Client {
                     }
                 } else if (input.startsWith("list")) {
                     ListRequest req = new ListRequest(authToken);
+                    System.out.println("Make request");
                     ListResult res = serverFacade.listGames(req);
+                    System.out.println("request made");
+
+
 
                     recentGameListing = res.games();
 

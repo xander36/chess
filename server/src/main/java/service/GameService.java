@@ -21,6 +21,7 @@ public class GameService {
     }
 
     public ListResult listGames(ListRequest listRequest) throws DataAccessException {
+        System.out.println("game handler wants list");
         String authToken = listRequest.authToken();
 
         authAccess.getAuth(authToken);

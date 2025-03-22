@@ -32,11 +32,13 @@ public class ServerFacade {
 
 
     public ListResult listGames(ListRequest listRequest) {
+        System.out.println("list games facade");
         var path = "/game";
         return this.makeRequest("GET", path, listRequest, listRequest.authToken(), ListResult.class);
     }
 
     public MakeGameResult makeGame(MakeGameRequest makeGameRequest){
+        System.out.println("make game facade");
         var path = "/game";
         return this.makeRequest("POST", path, makeGameRequest, makeGameRequest.authToken(), MakeGameResult.class);
     }
@@ -52,6 +54,10 @@ public class ServerFacade {
     }
 
     private <T> T makeRequest(String method, String path, Object request, String authHeader, Class<T> responseClass) throws ServerFacadeException{
+        System.out.println("Wizardry begins. we build a " + method + " request");
+        System.out.println("we'll get back a " + responseClass);
+
+
         try {
             URL url = (new URI(this.url + path)).toURL();
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
@@ -59,11 +65,13 @@ public class ServerFacade {
             http.setDoOutput(true);
 
             if (authHeader != null){
+                System.out.println("Authorization will be bundled in");
                 http.setRequestProperty("Authorization", authHeader);
             }
 
             writeBody(request, http);
             http.connect();
+            System.out.println("connection wizardy happened");
             throwIfNotSuccessful(http);
             return readBody(http, responseClass);
         } catch (RuntimeException ex) {
@@ -97,12 +105,14 @@ public class ServerFacade {
     }
 
     private void throwIfNotSuccessful(HttpURLConnection http) throws IOException, ServerFacadeException {
-        System.out.println("serverside issues check");
+        System.out.println("serverside issues check - we got something back at least");
         var status = http.getResponseCode();
         System.out.println(status);
         if (!(status/100 == 2)) {
             try (InputStream respErr = http.getErrorStream()) {
+                System.out.println(respErr);
                 if (respErr != null) {
+                    System.out.println("There was a problem, imma build a nice error to wrap it up");
                     throw ServerFacadeException.fromJson(status, respErr);
                 }
             }
