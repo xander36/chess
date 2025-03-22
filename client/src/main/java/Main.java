@@ -9,7 +9,7 @@ public class Main {
         var piece = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
         System.out.println("♕ 240 Chess Client: " + piece);
 
-        System.out.println("Welcome!\n" + client.getPrompt());
+        System.out.print("Welcome!\n" + client.getPrompt());
 
         Scanner scan = new Scanner(System.in);
         String result = "";

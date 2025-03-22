@@ -1,4 +1,5 @@
 import chess.ChessBoard;
+import chess.ChessGame;
 import facade.ServerFacade;
 import request.*;
 import result.*;
@@ -14,6 +15,8 @@ public class Client {
     private boolean running = true;
     private String username = null;
     private String authToken = null;
+    private ChessGame game = null;
+    private ArrayList<String> recentGameListing = null;
 
     public String eval(String inString){
         String input = inString.trim();
@@ -58,6 +61,10 @@ public class Client {
                     if (parts.length != 2) {
                         return "Invalid arguments";
                     } else {
+
+                        System.out.println(authToken);
+                        System.out.println(parts[1]);
+
                         MakeGameRequest req = new MakeGameRequest(authToken, parts[1]);
                         MakeGameResult res = serverFacade.makeGame(req);
 
@@ -66,6 +73,8 @@ public class Client {
                 } else if (input.startsWith("list")) {
                     ListRequest req = new ListRequest(authToken);
                     ListResult res = serverFacade.listGames(req);
+
+                    recentGameListing = res.games();
 
                     StringBuilder outMsg = new StringBuilder();
 
@@ -87,6 +96,8 @@ public class Client {
                         JoinGameRequest req = new JoinGameRequest(authToken, parts[2], Integer.parseInt(parts[1]));
                         serverFacade.joinGame(req);
 
+                        game = getGameWithID(Integer.parseInt(parts[1]));
+
                         return "User " + username + " has joined game #" + parts[1] + " as the " + parts[2] + " player";
                     }
                 } else if (input.startsWith("observe")) {
@@ -94,14 +105,16 @@ public class Client {
                     if (parts.length != 2) {
                         return "Invalid arguments";
                     } else {
-                        return "someone forgot to add logic for observing a game";
+                        game = getGameWithID(Integer.parseInt(parts[1]));
+
+                        return "Lets observe game #" + parts[1];
                     }
                 } else if (input.startsWith("logout")) {
                     LogoutRequest req = new LogoutRequest(authToken);
                     serverFacade.logout(req);
 
                     status = "LOGGED_IN";
-                    String outMsg = "Logged out successfully. So long, " + username;
+                    String outMsg = "Logged out successfully. So long, " + username + "!";
                     username = null;
                     authToken = null;
 
@@ -114,6 +127,21 @@ public class Client {
 
     private String getBoard(ChessBoard board){
         return "beautiful board pic";
+    }
+
+    private ChessGame getGameWithID(int id){
+        System.out.println("Quest to find game with id " + Integer.toString(id));
+        String gameListRepresentation = "";
+
+        for (String gameString : recentGameListing){
+            System.out.println(gameString);
+            gameListRepresentation = gameString;
+        }
+
+        if (gameListRepresentation.isEmpty()){
+            return null;
+        }
+        return new ChessGame(gameListRepresentation);
     }
 
     private String getHelpString(){
@@ -132,7 +160,7 @@ public class Client {
         String prompt = "[";
         prompt += status;
 
-        prompt += "] >>>";
+        prompt += "] >>> ";
         return prompt;
     }
 }

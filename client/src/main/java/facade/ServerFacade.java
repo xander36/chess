@@ -93,7 +93,9 @@ public class ServerFacade {
     }
 
     private void throwIfNotSuccessful(HttpURLConnection http) throws IOException, ServerFacadeException {
+        System.out.println("serverfcade issues check");
         var status = http.getResponseCode();
+        System.out.println(status);
         if (!(status/100 == 2)) {
             try (InputStream respErr = http.getErrorStream()) {
                 if (respErr != null) {
@@ -103,5 +105,6 @@ public class ServerFacade {
 
             throw new ServerFacadeException(status, "other failure: " + status);
         }
+        System.out.println("no issues");
     }
 }
