@@ -1,6 +1,7 @@
 import chess.ChessBoard;
 import chess.ChessGame;
 import facade.ServerFacade;
+import facade.ServerFacadeException;
 import request.*;
 import result.*;
 
@@ -31,35 +32,49 @@ public class Client {
                 if (input.startsWith("register")) {
                     String[] parts = input.split(" ");
                     if (parts.length != 4) {
-                        return "Invalid registration data";
+                        return "Please provide a username, password, and email";
                     } else {
                         RegisterRequest req = new RegisterRequest(parts[1], parts[2], parts[3]);
-                        RegisterResult res = serverFacade.register(req);
+                        try {
+                            RegisterResult res = serverFacade.register(req);
+                            status = "LOGGED_IN";
+                            username = res.username();
+                            authToken = res.authToken();
+                            return "Registered user " + res.username() + " and logged in";
+                        } catch (ServerFacadeException e) {
+                            if (e.toString().contains("taken")){
+                                return "That username is taken, try another";
+                            }
+                        }
 
-                        status = "LOGGED_IN";
-                        username = res.username();
-                        authToken = res.authToken();
-                        return "Registered user " + res.username() + " and logged in";
                     }
                 } else if (input.startsWith("login")) {
                     String[] parts = input.split(" ");
                     if (parts.length != 3) {
-                        return "Invalid login data";
+                        return "Please provide a username and password";
                     } else {
                         LoginRequest req = new LoginRequest(parts[1], parts[2]);
-                        LoginResult res = serverFacade.login(req);
+                        try{
+                            LoginResult res = serverFacade.login(req);
 
-                        status = "LOGGED_IN";
-                        username = res.username();
-                        authToken = res.authToken();
-                        return "Logged in user " + res.username();
+                            status = "LOGGED_IN";
+                            username = res.username();
+                            authToken = res.authToken();
+                            return "Logged in user " + res.username();
+                        } catch(ServerFacadeException e) {
+                            if (e.toString().contains("unauthorized")){
+                                return "That combination of username and password is unrecognized, try logging in again";
+                            }
+                            System.out.println(e.toString());
+                        }
+
                     }
                 }
             } else if (status.equals("LOGGED_IN")) {
                 if (input.startsWith("create")) {
                     String[] parts = input.split(" ");
                     if (parts.length != 2) {
-                        return "Invalid arguments";
+                        return "Invalid, please provide a name for the game to create";
                     } else {
 
                         MakeGameRequest req = new MakeGameRequest(authToken, parts[1]);
@@ -119,7 +134,7 @@ public class Client {
                     LogoutRequest req = new LogoutRequest(authToken);
                     serverFacade.logout(req);
 
-                    status = "LOGGED_IN";
+                    status = "LOGGED_OUT";
                     String outMsg = "Logged out successfully. So long, " + username + "!";
                     username = null;
                     authToken = null;
@@ -128,7 +143,7 @@ public class Client {
                 }
             }
         }
-        return "F in the chat, what did you dooooooo to meeeeee";
+        return "Alright Curtis you forgot to implement something";
     }
 
     private String getBoard(ChessBoard board){
