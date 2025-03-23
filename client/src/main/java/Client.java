@@ -15,7 +15,7 @@ public class Client {
     private boolean running = true;
     private String username = null;
     private String authToken = null;
-    private ChessGame game = null;
+    private String game = null;
     private ArrayList<String> recentGameListing = null;
 
     public String eval(String inString){
@@ -57,14 +57,10 @@ public class Client {
                 }
             } else if (status.equals("LOGGED_IN")) {
                 if (input.startsWith("create")) {
-                    System.out.println("creation process begins ");
                     String[] parts = input.split(" ");
                     if (parts.length != 2) {
                         return "Invalid arguments";
                     } else {
-
-                        System.out.println("I authorize my clreation with the system authroizer " + authToken);
-                        System.out.println(parts[1]);
 
                         MakeGameRequest req = new MakeGameRequest(authToken, parts[1]);
                         MakeGameResult res = serverFacade.makeGame(req);
@@ -73,9 +69,7 @@ public class Client {
                     }
                 } else if (input.startsWith("list")) {
                     ListRequest req = new ListRequest(authToken);
-                    System.out.println("Make request");
                     ListResult res = serverFacade.listGames(req);
-                    System.out.println("request made");
 
 
 
@@ -141,19 +135,17 @@ public class Client {
         return "beautiful board pic";
     }
 
-    private ChessGame getGameWithID(int id){
-        System.out.println("Quest to find game with id " + Integer.toString(id));
+    private String getGameWithID(int id){
         String gameListRepresentation = "";
 
         for (String gameString : recentGameListing){
-            System.out.println(gameString);
             gameListRepresentation = gameString;
         }
 
         if (gameListRepresentation.isEmpty()){
             return null;
         }
-        return new ChessGame(gameListRepresentation);
+        return gameListRepresentation;
     }
 
     private String getHelpString(){

@@ -32,13 +32,11 @@ public class ServerFacade {
 
 
     public ListResult listGames(ListRequest listRequest) {
-        System.out.println("list games facade");
         var path = "/game";
         return this.makeRequest("GET", path, listRequest, listRequest.authToken(), ListResult.class);
     }
 
     public MakeGameResult makeGame(MakeGameRequest makeGameRequest){
-        System.out.println("make game facade");
         var path = "/game";
         return this.makeRequest("POST", path, makeGameRequest, makeGameRequest.authToken(), MakeGameResult.class);
     }
@@ -53,31 +51,33 @@ public class ServerFacade {
         return this.makeRequest("DELETE", path, clearRequest, null, ClearResult.class);
     }
 
-    private <T> T makeRequest(String method, String path, Object request, String authHeader, Class<T> responseClass) throws ServerFacadeException{
-        System.out.println("Wizardry begins. we build a " + method + " request");
-        System.out.println("we'll get back a " + responseClass);
+    private <T> T makeRequest(String method, String path, Object request, String authHeader, Class<T> responseClass) throws ServerFacadeException {
 
-
+        HttpURLConnection http = null;
         try {
             URL url = (new URI(this.url + path)).toURL();
-            HttpURLConnection http = (HttpURLConnection) url.openConnection();
+            http = (HttpURLConnection) url.openConnection();
             http.setRequestMethod(method);
-            http.setDoOutput(true);
 
-            if (authHeader != null){
-                System.out.println("Authorization will be bundled in");
+            if (authHeader != null) {
                 http.setRequestProperty("Authorization", authHeader);
             }
 
-            writeBody(request, http);
+            if (method.equals("POST") || method.equals("PUT")) {
+                http.setDoOutput(true);
+                writeBody(request, http);
+            }
+
             http.connect();
-            System.out.println("connection wizardy happened");
             throwIfNotSuccessful(http);
             return readBody(http, responseClass);
-        } catch (RuntimeException ex) {
-            throw ex;
+
         } catch (Exception ex) {
-            throw new ServerFacadeException(500, ex.getMessage());
+            throw new ServerFacadeException(500, "Error: " + ex.getMessage());
+        } finally {
+            if (http != null) {
+                http.disconnect();
+            }
         }
     }
 
@@ -105,20 +105,15 @@ public class ServerFacade {
     }
 
     private void throwIfNotSuccessful(HttpURLConnection http) throws IOException, ServerFacadeException {
-        System.out.println("serverside issues check - we got something back at least");
         var status = http.getResponseCode();
-        System.out.println(status);
         if (!(status/100 == 2)) {
             try (InputStream respErr = http.getErrorStream()) {
-                System.out.println(respErr);
                 if (respErr != null) {
-                    System.out.println("There was a problem, imma build a nice error to wrap it up");
                     throw ServerFacadeException.fromJson(status, respErr);
                 }
             }
 
             throw new ServerFacadeException(status, "other failure: " + status);
         }
-        System.out.println("no issues");
     }
 }

@@ -1,5 +1,6 @@
 package handler;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import dataaccess.DataAccessException;
@@ -40,6 +41,8 @@ public class GameHandler {
         try {
             ListResult result = gameService.listGames(request);
             ArrayList<String> list = result.games();
+
+
 
             StringBuilder outString = new StringBuilder();
             outString.append("{ \"games\": [");

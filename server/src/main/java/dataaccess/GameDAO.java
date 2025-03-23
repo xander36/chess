@@ -1,5 +1,7 @@
 package dataaccess;
 
+import chess.ChessGame;
+
 import java.util.ArrayList;
 
 public interface GameDAO {
