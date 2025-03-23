@@ -94,11 +94,33 @@ public class Client {
 
                     outMsg.append("All current games:\n");
                     for (String game : res.games()){
-                        outMsg.append(game);
-                        outMsg.append("\n");
+                        String[] infos = game.split(" ");
+
+                        String gameNum = infos[0].split(":")[1];
+                        String whitePlayer = infos[1].split(":")[1];
+                        String blackPlayer = infos[2].split(":")[1];
+                        String gameName = infos[3].split(":")[1];
+
+
+                        outMsg.append(gameNum);
+                        outMsg.append("- ");
+                        outMsg.append(gameName);
+                        outMsg.append(": ");
+                        if (whitePlayer.equals("null")){
+                            outMsg.append("<waiting for player>");
+                        } else{
+                            outMsg.append(whitePlayer);
+                        }
+                        outMsg.append(" (WHITE) vs ");
+                        if (blackPlayer.equals("null")){
+                            outMsg.append("<waiting for player>");
+                        } else{
+                            outMsg.append(blackPlayer);
+                        }
+                        outMsg.append(" (BLACK)\n");
                     }
 
-                    return outMsg.toString();
+                    return outMsg.toString().trim();
 
                 } else if (input.startsWith("join")) {
                     String[] parts = input.split(" ");
@@ -115,11 +137,20 @@ public class Client {
                         }
 
                         JoinGameRequest req = new JoinGameRequest(authToken, parts[2], gameID);
-                        serverFacade.joinGame(req);
+                        try{
+                            serverFacade.joinGame(req);
+                            game = getGameWithID(Integer.parseInt(parts[1]));
 
-                        game = getGameWithID(Integer.parseInt(parts[1]));
+                            return "User " + username + " has joined game #" + parts[1] + " as the " + parts[2] + " player";
 
-                        return "User " + username + " has joined game #" + parts[1] + " as the " + parts[2] + " player";
+                        } catch (ServerFacadeException e) {
+                            if (e.toString().contains("taken")){
+                                return "That player spot is taken";
+                            } else if (e.toString().contains("bad")){
+                                return "No game with that ID, try again";
+                            }
+                        }
+
                     }
                 } else if (input.startsWith("observe")) {
                     String[] parts = input.split(" ");
