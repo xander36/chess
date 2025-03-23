@@ -80,7 +80,7 @@ public class Client {
                         MakeGameRequest req = new MakeGameRequest(authToken, parts[1]);
                         MakeGameResult res = serverFacade.makeGame(req);
 
-                        return "Game called " + parts[1] + "has been started";
+                        return "Game called " + parts[1] + " has been started";
                     }
                 } else if (input.startsWith("list")) {
                     ListRequest req = new ListRequest(authToken);
@@ -155,11 +155,14 @@ public class Client {
                 } else if (input.startsWith("observe")) {
                     String[] parts = input.split(" ");
                     if (parts.length != 2) {
-                        return "Invalid arguments";
+                        return "Please provide a game ID to observe";
                     } else {
                         game = getGameWithID(Integer.parseInt(parts[1]));
+                        if (game == null){
+                            return "No game with that ID";
+                        }
 
-                        return "Lets observe game #" + parts[1];
+                        return "Lets observe game #" + parts[1] + "\n" + getBoard();
                     }
                 } else if (input.startsWith("logout")) {
                     LogoutRequest req = new LogoutRequest(authToken);
@@ -177,7 +180,7 @@ public class Client {
         return "Alright Curtis you forgot to implement something";
     }
 
-    private String getBoard(ChessBoard board){
+    private String getBoard(){
         return "beautiful board pic";
     }
 
@@ -185,7 +188,12 @@ public class Client {
         String gameListRepresentation = "";
 
         for (String gameString : recentGameListing){
-            gameListRepresentation = gameString;
+            String[] infos = gameString.split(" ");
+
+            String gameNum = infos[0].split(":")[1];
+            if (Integer.parseInt(gameNum) == id){
+                gameListRepresentation = gameString;
+            }
         }
 
         if (gameListRepresentation.isEmpty()){

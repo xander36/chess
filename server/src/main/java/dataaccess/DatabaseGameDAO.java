@@ -40,6 +40,13 @@ public class DatabaseGameDAO implements GameDAO {
         } catch (DataAccessException e) {
             //System.out.println("Database connection had a problem");
         }
+
+        try{
+            ArrayList<String> games = listGames("lol i'm hacking myself");
+            this.size = games.size();
+        } catch(Exception e){
+            System.out.println("For some reason data access cant list itself");
+        }
     }
 
     public void clear() {
