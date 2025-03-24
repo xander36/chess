@@ -175,9 +175,18 @@ public class ServerFacadeTests {
             Assertions.assertEquals("[gameID:1 " +
                     "whiteUsername:null " +
                     "blackUsername:null " +
-                    "gameName:chess2 game:null]", result.games().toString());
+                    "gameName:chess2 game:WHITE\n" +
+                    "RNBQKBNR\n" +
+                    "PPPPPPPP\n" +
+                    "********\n" +
+                    "********\n" +
+                    "********\n" +
+                    "********\n" +
+                    "pppppppp\n" +
+                    "rnbqkbnr\n]", result.games().toString());
 
         } catch (Exception e){
+            System.out.println(e.toString());
             //If listing the games throws an error fail the test by failing an assertion
             Assertions.fail();
         }

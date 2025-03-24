@@ -140,8 +140,11 @@ public class Client {
                         try{
                             serverFacade.joinGame(req);
                             game = getGameWithID(Integer.parseInt(parts[1]));
+                            if (game == null){
+                                return "No game with that ID";
+                            }
 
-                            return "User " + username + " has joined game #" + parts[1] + " as the " + parts[2] + " player";
+                            return "User " + username + " has joined game #" + parts[1] + " as the " + parts[2] + " player" + "\n" + getBoard();
 
                         } catch (ServerFacadeException e) {
                             if (e.toString().contains("taken")){
@@ -181,7 +184,13 @@ public class Client {
     }
 
     private String getBoard(){
-        return "beautiful board pic";
+        String[] infos = game.split(" ");
+
+        String gameString = infos[4].split(":")[1];
+
+
+
+        return gameString;
     }
 
     private String getGameWithID(int id){

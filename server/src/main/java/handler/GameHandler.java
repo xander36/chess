@@ -51,6 +51,7 @@ public class GameHandler {
             outString.append("]}");
 
             res.status(200);
+            System.out.println(outString.toString());
             return outString.toString();
         }
         catch (DataAccessException e){

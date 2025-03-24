@@ -21,9 +21,7 @@ public class ChessGame {
     }
 
     public ChessGame(String representString){
-        String[] fields = representString.split(" ");
-        String gameString = fields[4].split(":")[1];
-        if (gameString.startsWith("BLACK")){
+        if (representString.startsWith("BLACK")){
             this.turn = TeamColor.BLACK;
         }else{
             this.turn = TeamColor.WHITE;

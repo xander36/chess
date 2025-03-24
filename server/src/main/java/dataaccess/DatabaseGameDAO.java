@@ -92,7 +92,7 @@ public class DatabaseGameDAO implements GameDAO {
                     Gson gson = new Gson();
 
                     outList.add(String.format("\"gameID:%s whiteUsername:%s blackUsername:%s gameName:%s game:%s\"",
-                            game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName(), gson.toJson(game.game())));
+                            game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName(), game.game().toString()));
 
                 }
 
@@ -113,7 +113,7 @@ public class DatabaseGameDAO implements GameDAO {
         int newId = size+1;
         System.out.println("Make number");
         System.out.println(newId);
-        GameData newGame = new GameData(newId, null, null, gameName, null);
+        GameData newGame = new GameData(newId, null, null, gameName, new ChessGame());
 
         try (var conn = DatabaseManager.getConnection()) {
             String addStatement = "INSERT INTO game (gameID, whiteUsername, blackUsername, gameName, game) VALUES (?, ?, ?, ?, ?)";
@@ -122,7 +122,7 @@ public class DatabaseGameDAO implements GameDAO {
                 preparedStatement.setString(2,null);
                 preparedStatement.setString(3, null);
                 preparedStatement.setString(4, newGame.gameName());
-                preparedStatement.setString(5, "null");
+                preparedStatement.setString(5, newGame.game().toString());
 
                 System.out.println(preparedStatement.toString());
 
