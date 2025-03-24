@@ -10,6 +10,8 @@ import result.*;
 import java.util.ArrayList;
 import java.util.Objects;
 
+import static ui.EscapeSequences.*;
+
 public class Client {
 
     private ServerFacade serverFacade = new ServerFacade("http://localhost:8080");
@@ -194,34 +196,49 @@ public class Client {
         String LETTER_ROW;
         String[] NUMBER_COLUMN;
         if (team.equals("WHITE")){
-            LETTER_ROW = "    a  b  c  d  e  f  g  h   ";
+            LETTER_ROW = "    a  b  c  d  e  f  g  h    ";
             NUMBER_COLUMN = new String[]{" 8 ", " 7 ", " 6 ", " 5 ", " 4 ", " 3 ", " 2 ", " 1 "};
 
         } else if (team.equals("BLACK")){
-            LETTER_ROW = "    h  g  f  e  d  c  b  a    ";
+            LETTER_ROW = "    h  g  f  e  d  c  b  a     ";
             NUMBER_COLUMN = new String[]{" 1 ", " 2 ", " 3 ", " 4 ", " 5 ", " 6 ", " 7 ", " 8 "};
         } else{
             return "C'mon son";
         }
 
+        LETTER_ROW = SET_BG_COLOR_DARK_GREEN + SET_TEXT_COLOR_WHITE + LETTER_ROW;
+        for (int i = 0; i < 8; i++){
+            NUMBER_COLUMN[i] = SET_BG_COLOR_DARK_GREEN + SET_TEXT_COLOR_WHITE + NUMBER_COLUMN[i];
+        }
 
-        fancyString.append(LETTER_ROW + "\n");
+
+        fancyString.append(LETTER_ROW + RESET_BG_COLOR + "\n");
 
         ChessBoard board = new ChessBoard(gameString.substring(6));
 
         for (int i = 1; i < 9; i++){
             fancyString.append(NUMBER_COLUMN[i-1]);
             for (int j = 1; j < 9; j++){
+                if ((i+j) % 2 == 0){
+                    fancyString.append(SET_BG_COLOR_WHITE);
+                } else {
+                    fancyString.append(SET_BG_COLOR_BLACK);
+                }
                 ChessPiece piece = board.getPiece(new ChessPosition(i, j));
                 if (piece == null){
                     fancyString.append("   ");
                 } else {
+                    if (piece.getTeamColor() == ChessGame.TeamColor.WHITE){
+                        fancyString.append(SET_TEXT_COLOR_RED);
+                    } else{
+                        fancyString.append(SET_TEXT_COLOR_BLUE);
+                    }
                     fancyString.append(" " + piece.toString() + " ");
                 }
             }
-            fancyString.append(NUMBER_COLUMN[i-1] + "\n");
+            fancyString.append(NUMBER_COLUMN[i-1] + RESET_BG_COLOR + "\n");
         }
-        fancyString.append(LETTER_ROW);
+        fancyString.append(LETTER_ROW + RESET_BG_COLOR);
 
         return fancyString.toString();
     }
