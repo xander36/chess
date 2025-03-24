@@ -1,6 +1,7 @@
 package service;
 
 import dataaccess.*;
+import dataclasses.*;
 import request.JoinGameRequest;
 import request.ListRequest;
 import request.MakeGameRequest;

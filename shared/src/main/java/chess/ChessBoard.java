@@ -32,7 +32,10 @@ public class ChessBoard {
     }
 
     public ChessBoard (String representString){
-        String[] rows = representString.split("\n");
+        System.out.println("we do");
+        System.out.println(representString);
+
+        String[] rows = representString.split("&");
         contents = new ChessPiece[8][8];
         for (int i = 0; i < 8; i++){
             String row = rows[i];
@@ -146,7 +149,7 @@ public class ChessBoard {
                     out += piece.toString();
                 }
             }
-            out += "\n";
+            out += "&";
         }
 
         return out;

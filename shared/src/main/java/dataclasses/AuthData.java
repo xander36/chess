@@ -1,4 +1,4 @@
-package dataaccess;
+package dataclasses;
 
 public record AuthData(String username, String authToken) {
     @Override

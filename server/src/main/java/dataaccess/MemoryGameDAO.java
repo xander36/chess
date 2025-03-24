@@ -1,7 +1,6 @@
 package dataaccess;
 
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class MemoryGameDAO implements GameDAO {
@@ -13,11 +12,10 @@ public class MemoryGameDAO implements GameDAO {
     }
 
     public ArrayList<String> listGames (String authToken){
-        ArrayList<String> outList = new ArrayList<String>();
+        ArrayList<String> outList = new ArrayList<>();
 
         for (GameData game : games){
-            outList.add(String.format("{\"gameID\": %s, \"whiteUsername\": %s, \"blackUsername\": %s, \"gameName\": \"%s\"}",
-                    game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName()));
+            outList.add(game.toString());
         }
 
         return outList;

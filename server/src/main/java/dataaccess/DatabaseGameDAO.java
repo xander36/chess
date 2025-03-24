@@ -2,9 +2,7 @@ package dataaccess;
 
 
 import chess.ChessGame;
-import com.google.gson.Gson;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class DatabaseGameDAO implements GameDAO {
@@ -89,10 +87,7 @@ public class DatabaseGameDAO implements GameDAO {
 
                     GameData game = new GameData(gameID, whiteUsername, blackUsername, gameName, gameObj);
 
-                    Gson gson = new Gson();
-
-                    outList.add(String.format("\"gameID:%s whiteUsername:%s blackUsername:%s gameName:%s game:%s\"",
-                            game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName(), game.game().toString()));
+                    outList.add("\"" + game.toString().replace("\n", "\\n") + "\"");
 
                 }
 
