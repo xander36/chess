@@ -1,6 +1,8 @@
 package dataaccess;
 
 
+import dataclasses.GameData;
+
 import java.util.ArrayList;
 
 public class MemoryGameDAO implements GameDAO {
@@ -11,14 +13,10 @@ public class MemoryGameDAO implements GameDAO {
         games.clear();
     }
 
-    public ArrayList<String> listGames (String authToken){
+    public ArrayList<GameData> listGames (String authToken){
         ArrayList<String> outList = new ArrayList<>();
 
-        for (GameData game : games){
-            outList.add(game.toString());
-        }
-
-        return outList;
+        return games;
     }
 
     public int makeGame(String gameName){

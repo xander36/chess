@@ -1,5 +1,7 @@
 package dataaccess;
 
+import dataclasses.AuthData;
+
 import java.sql.SQLException;
 import java.util.ArrayList;
 

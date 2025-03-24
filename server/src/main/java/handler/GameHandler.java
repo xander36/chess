@@ -4,6 +4,7 @@ import chess.ChessGame;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import dataaccess.DataAccessException;
+import dataclasses.GameData;
 import request.JoinGameRequest;
 import request.ListRequest;
 import request.MakeGameRequest;
@@ -40,19 +41,10 @@ public class GameHandler {
 
         try {
             ListResult result = gameService.listGames(request);
-            ArrayList<String> list = result.games();
-
-
-
-            StringBuilder outString = new StringBuilder();
-            outString.append("{ \"games\": [");
-            String gamesString = String.join(",", list);
-            outString.append(gamesString);
-            outString.append("]}");
 
             res.status(200);
-            System.out.println(outString.toString());
-            return outString.toString();
+
+            return gson.toJson(result);
         }
         catch (DataAccessException e){
             res.status(401);

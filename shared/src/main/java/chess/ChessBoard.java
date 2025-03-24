@@ -32,8 +32,6 @@ public class ChessBoard {
     }
 
     public ChessBoard (String representString){
-        System.out.println("we do");
-        System.out.println(representString);
 
         String[] rows = representString.split("&");
         contents = new ChessPiece[8][8];

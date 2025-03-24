@@ -1,6 +1,7 @@
 package service;
 
 import dataaccess.*;
+import dataclasses.*;
 import org.mindrot.jbcrypt.BCrypt;
 import request.LoginRequest;
 import request.LogoutRequest;

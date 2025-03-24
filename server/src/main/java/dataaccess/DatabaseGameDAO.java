@@ -2,6 +2,7 @@ package dataaccess;
 
 
 import chess.ChessGame;
+import dataclasses.GameData;
 
 import java.util.ArrayList;
 
@@ -40,7 +41,7 @@ public class DatabaseGameDAO implements GameDAO {
         }
 
         try{
-            ArrayList<String> games = listGames("lol i'm hacking myself");
+            ArrayList<GameData> games = listGames("lol i'm hacking myself");
             this.size = games.size();
         } catch(Exception e){
             System.out.println("For some reason data access cant list itself");
@@ -60,12 +61,12 @@ public class DatabaseGameDAO implements GameDAO {
         }
     }
 
-    public ArrayList<String> listGames (String authToken) throws DataAccessException{
+    public ArrayList<GameData> listGames (String authToken) throws DataAccessException{
         if(authToken.equals("")){
             throw new DataAccessException("no authtoken");
         }
 
-        ArrayList<String> outList = new ArrayList<String>();
+        ArrayList<GameData> outList = new ArrayList<GameData>();
         try (var conn = DatabaseManager.getConnection()) {
             String addStatement = "SELECT gameID, whiteUsername, blackUsername, gameName, game FROM game";
             try (var preparedStatement = conn.prepareStatement(addStatement)) {
@@ -87,7 +88,7 @@ public class DatabaseGameDAO implements GameDAO {
 
                     GameData game = new GameData(gameID, whiteUsername, blackUsername, gameName, gameObj);
 
-                    outList.add("\"" + game.toString().replace("\n", "\\n") + "\"");
+                    outList.add(game);
 
                 }
 

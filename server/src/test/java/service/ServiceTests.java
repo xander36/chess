@@ -1,6 +1,7 @@
 package service;
 
 import dataaccess.*;
+import dataclasses.*;
 import org.junit.jupiter.api.*;
 import org.mindrot.jbcrypt.BCrypt;
 import request.*;
@@ -215,10 +216,7 @@ public class ServiceTests {
             ListRequest request = new ListRequest(userAuthToken);
             ListResult result = gameService.listGames(request);
 
-            Assertions.assertEquals("[{\"gameID\": 1, " +
-                    "\"whiteUsername\": null, " +
-                    "\"blackUsername\": null, " +
-                    "\"gameName\": \"chess2\"}]", result.games().toString());
+            Assertions.assertEquals("[GameData[gameID=1, whiteUsername=null, blackUsername=null, gameName=chess2, game=null]]", result.games().toString());
 
         } catch (Exception e){
             //If listing the games throws an error fail the test by failing an assertion

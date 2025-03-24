@@ -1,6 +1,7 @@
 package dataaccess;
 
 import dataaccess.*;
+import dataclasses.*;
 import org.junit.jupiter.api.*;
 
 import java.util.ArrayList;
@@ -212,7 +213,7 @@ public class DataAccessTests {
             gameAccess.makeGame("fun game");
             gameAccess.makeGame("another game");
 
-            ArrayList<String> gameList  = gameAccess.listGames(data.authToken());
+            ArrayList<GameData> gameList  = gameAccess.listGames(data.authToken());
 
         }catch(Exception e){
             Assertions.fail();
@@ -230,7 +231,7 @@ public class DataAccessTests {
             gameAccess.makeGame("fun game");
             gameAccess.makeGame("another game");
 
-            ArrayList<String> gameList  = gameAccess.listGames("");
+            ArrayList<GameData> gameList  = gameAccess.listGames("");
 
             Assertions.fail();
 

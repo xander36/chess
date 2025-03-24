@@ -1,5 +1,7 @@
 package dataaccess;
 
+import dataclasses.UserData;
+
 import java.util.ArrayList;
 
 public class MemoryUserDAO implements UserDAO {

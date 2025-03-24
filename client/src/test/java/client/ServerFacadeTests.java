@@ -172,18 +172,7 @@ public class ServerFacadeTests {
             ListRequest request = new ListRequest(userAuthToken);
             ListResult result = serverFacade.listGames(request);
 
-            Assertions.assertEquals("[gameID:1 " +
-                    "whiteUsername:null " +
-                    "blackUsername:null " +
-                    "gameName:chess2 game:WHITE\n" +
-                    "RNBQKBNR\n" +
-                    "PPPPPPPP\n" +
-                    "********\n" +
-                    "********\n" +
-                    "********\n" +
-                    "********\n" +
-                    "pppppppp\n" +
-                    "rnbqkbnr\n]", result.games().toString());
+            Assertions.assertEquals("[GameData[gameID=1, whiteUsername=null, blackUsername=null, gameName=chess2, game=WHITE&RNBQKBNR&PPPPPPPP&********&********&********&********&pppppppp&rnbqkbnr&]]", result.games().toString());
 
         } catch (Exception e){
             System.out.println(e.toString());

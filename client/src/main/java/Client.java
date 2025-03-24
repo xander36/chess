@@ -2,6 +2,7 @@ import chess.ChessBoard;
 import chess.ChessGame;
 import chess.ChessPiece;
 import chess.ChessPosition;
+import dataclasses.GameData;
 import facade.ServerFacade;
 import facade.ServerFacadeException;
 import request.*;
@@ -20,8 +21,8 @@ public class Client {
     private boolean running = true;
     private String username = null;
     private String authToken = null;
-    private String game = null;
-    private ArrayList<String> recentGameListing = null;
+    private GameData game = null;
+    private ArrayList<GameData> recentGameListing = null;
 
     public String eval(String inString){
         String input = inString.trim();
@@ -44,6 +45,9 @@ public class Client {
                             status = "LOGGED_IN";
                             username = res.username();
                             authToken = res.authToken();
+
+                            recentGameListing = serverFacade.listGames(new ListRequest(authToken)).games();
+
                             return "Registered user " + res.username() + " and logged in";
                         } catch (ServerFacadeException e) {
                             if (e.toString().contains("taken")){
@@ -64,6 +68,7 @@ public class Client {
                             status = "LOGGED_IN";
                             username = res.username();
                             authToken = res.authToken();
+                            recentGameListing = serverFacade.listGames(new ListRequest(authToken)).games();
                             return "Logged in user " + res.username();
                         } catch(ServerFacadeException e) {
                             if (e.toString().contains("unauthorized")){
@@ -84,26 +89,26 @@ public class Client {
                         MakeGameRequest req = new MakeGameRequest(authToken, parts[1]);
                         MakeGameResult res = serverFacade.makeGame(req);
 
+                        recentGameListing = serverFacade.listGames(new ListRequest(authToken)).games();
+
                         return "Game called " + parts[1] + " has been started";
                     }
                 } else if (input.startsWith("list")) {
                     ListRequest req = new ListRequest(authToken);
                     ListResult res = serverFacade.listGames(req);
 
-
-
                     recentGameListing = res.games();
 
                     StringBuilder outMsg = new StringBuilder();
 
                     outMsg.append("All current games:\n");
-                    for (String game : res.games()){
-                        String[] infos = game.split(" ");
+                    for (GameData game : res.games()){
 
-                        String gameNum = infos[0].split(":")[1];
-                        String whitePlayer = infos[1].split(":")[1];
-                        String blackPlayer = infos[2].split(":")[1];
-                        String gameName = infos[3].split(":")[1];
+
+                        int gameNum = game.gameID();
+                        String whitePlayer = game.whiteUsername();
+                        String blackPlayer = game.blackUsername();
+                        String gameName = game.gameName();
 
 
                         outMsg.append(gameNum);
@@ -148,7 +153,7 @@ public class Client {
                                 return "No game with that ID";
                             }
 
-                            return "User " + username + " has joined game #" + parts[1] + " as the " + parts[2] + " player" + "\n" + getBoard(parts[2]);
+                            return "User " + username + " has joined game #" + game.gameID() + " as the " + parts[2] + " player" + "\n" + getBoard(parts[2]);
 
                         } catch (ServerFacadeException e) {
                             if (e.toString().contains("taken")){
@@ -188,9 +193,8 @@ public class Client {
     }
 
     private String getBoard(String team){
-        String[] infos = game.split(" ");
 
-        String gameString = infos[4].split(":")[1];
+        String gameString = game.game().toString();
 
         StringBuilder fancyString = new StringBuilder();
         String LETTER_ROW;
@@ -243,22 +247,15 @@ public class Client {
         return fancyString.toString();
     }
 
-    private String getGameWithID(int id){
-        String gameListRepresentation = "";
+    private GameData getGameWithID(int id){
 
-        for (String gameString : recentGameListing){
-            String[] infos = gameString.split(" ");
+        for (GameData game : recentGameListing){
 
-            String gameNum = infos[0].split(":")[1];
-            if (Integer.parseInt(gameNum) == id){
-                gameListRepresentation = gameString;
+            if (game.gameID() == id){
+                return game;
             }
         }
-
-        if (gameListRepresentation.isEmpty()){
-            return null;
-        }
-        return gameListRepresentation;
+        return null;
     }
 
     private String getHelpString(){
