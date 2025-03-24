@@ -1,5 +1,7 @@
 import chess.ChessBoard;
 import chess.ChessGame;
+import chess.ChessPiece;
+import chess.ChessPosition;
 import facade.ServerFacade;
 import facade.ServerFacadeException;
 import request.*;
@@ -144,7 +146,7 @@ public class Client {
                                 return "No game with that ID";
                             }
 
-                            return "User " + username + " has joined game #" + parts[1] + " as the " + parts[2] + " player" + "\n" + getBoard();
+                            return "User " + username + " has joined game #" + parts[1] + " as the " + parts[2] + " player" + "\n" + getBoard(parts[2]);
 
                         } catch (ServerFacadeException e) {
                             if (e.toString().contains("taken")){
@@ -165,7 +167,7 @@ public class Client {
                             return "No game with that ID";
                         }
 
-                        return "Lets observe game #" + parts[1] + "\n" + getBoard();
+                        return "Lets observe game #" + parts[1] + "\n" + getBoard("WHITE");
                     }
                 } else if (input.startsWith("logout")) {
                     LogoutRequest req = new LogoutRequest(authToken);
@@ -183,14 +185,45 @@ public class Client {
         return "Alright Curtis you forgot to implement something";
     }
 
-    private String getBoard(){
+    private String getBoard(String team){
         String[] infos = game.split(" ");
 
         String gameString = infos[4].split(":")[1];
 
+        StringBuilder fancyString = new StringBuilder();
+        String LETTER_ROW;
+        String[] NUMBER_COLUMN;
+        if (team.equals("WHITE")){
+            LETTER_ROW = "    a  b  c  d  e  f  g  h   ";
+            NUMBER_COLUMN = new String[]{" 8 ", " 7 ", " 6 ", " 5 ", " 4 ", " 3 ", " 2 ", " 1 "};
+
+        } else if (team.equals("BLACK")){
+            LETTER_ROW = "    h  g  f  e  d  c  b  a    ";
+            NUMBER_COLUMN = new String[]{" 1 ", " 2 ", " 3 ", " 4 ", " 5 ", " 6 ", " 7 ", " 8 "};
+        } else{
+            return "C'mon son";
+        }
 
 
-        return gameString;
+        fancyString.append(LETTER_ROW + "\n");
+
+        ChessBoard board = new ChessBoard(gameString.substring(6));
+
+        for (int i = 1; i < 9; i++){
+            fancyString.append(NUMBER_COLUMN[i-1]);
+            for (int j = 1; j < 9; j++){
+                ChessPiece piece = board.getPiece(new ChessPosition(i, j));
+                if (piece == null){
+                    fancyString.append("   ");
+                } else {
+                    fancyString.append(" " + piece.toString() + " ");
+                }
+            }
+            fancyString.append(NUMBER_COLUMN[i-1] + "\n");
+        }
+        fancyString.append(LETTER_ROW);
+
+        return fancyString.toString();
     }
 
     private String getGameWithID(int id){

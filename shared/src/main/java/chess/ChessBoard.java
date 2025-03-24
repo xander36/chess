@@ -32,13 +32,13 @@ public class ChessBoard {
     }
 
     public ChessBoard (String representString){
-        System.out.println("board");
+
+        System.out.println("It has been asked of me that I recosntute the following as an object:");
         System.out.println(representString);
         String[] rows = representString.split("\n");
         contents = new ChessPiece[8][8];
         for (int i = 0; i < 8; i++){
             String row = rows[i];
-            System.out.println("Row: " + row);
             ChessPiece[] newRow = new ChessPiece[8];
             for (int j = 0; j < 8; j++){
                 ChessGame.TeamColor team = ChessGame.TeamColor.BLACK;
