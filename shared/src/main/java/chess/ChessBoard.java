@@ -32,9 +32,6 @@ public class ChessBoard {
     }
 
     public ChessBoard (String representString){
-
-        System.out.println("It has been asked of me that I recosntute the following as an object:");
-        System.out.println(representString);
         String[] rows = representString.split("\n");
         contents = new ChessPiece[8][8];
         for (int i = 0; i < 8; i++){
