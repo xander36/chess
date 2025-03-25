@@ -38,8 +38,7 @@ public class ServerFacadeTests {
     private String quickFacadeRegister(){
         RegisterRequest request = new RegisterRequest("me", "you lol", "me@gmail.com");
         try {
-            RegisterResult result = serverFacade.register(request);
-            return result.authToken();
+            return serverFacade.register(request).authToken();
         } catch (Exception e){
             throw new RuntimeException("Somehow you screwed up the reigistartion process. nice.");
         }
@@ -48,8 +47,7 @@ public class ServerFacadeTests {
     private int quickFacadeStartGame(String authToken){
         MakeGameRequest request = new MakeGameRequest(authToken, "chess2");
         try {
-            MakeGameResult result = serverFacade.makeGame(request);
-            return result.gameID();
+            return serverFacade.makeGame(request).gameID();
         } catch (Exception e){
             throw new RuntimeException("Somehow you screwed up the start of a game. nice.");
         }
