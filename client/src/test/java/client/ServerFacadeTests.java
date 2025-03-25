@@ -35,7 +35,7 @@ public class ServerFacadeTests {
     }
 
 
-    private String quickRegister(){
+    private String quickFacadeRegister(){
         RegisterRequest request = new RegisterRequest("me", "you lol", "me@gmail.com");
         try {
             RegisterResult result = serverFacade.register(request);
@@ -45,7 +45,7 @@ public class ServerFacadeTests {
         }
     }
     
-    private int quickStartGame(String authToken){
+    private int quickFacadeStartGame(String authToken){
         MakeGameRequest request = new MakeGameRequest(authToken, "chess2");
         try {
             MakeGameResult result = serverFacade.makeGame(request);
@@ -95,7 +95,7 @@ public class ServerFacadeTests {
     public void loginSuccess(){
         serverFacade.clear(new ClearRequest());
         //Register the test user: "me"
-        quickRegister();
+        quickFacadeRegister();
 
         LoginRequest req = new LoginRequest("me", "you lol");
         LoginResult res= serverFacade.login(req);
@@ -109,7 +109,7 @@ public class ServerFacadeTests {
     public void loginFailure(){
         serverFacade.clear(new ClearRequest());
         //Register the test user: "me"
-        quickRegister();
+        quickFacadeRegister();
 
         //Attempt to log in as "me" with the wrong password
         LoginRequest request = new LoginRequest("me", "wrong password");
@@ -129,7 +129,7 @@ public class ServerFacadeTests {
     public void logoutSuccess(){
         serverFacade.clear(new ClearRequest());
         //Register the test user: "me" and hold onto its authtoken output
-        String userAuthToken = quickRegister();
+        String userAuthToken = quickFacadeRegister();
 
         //Attempt to log out of user
         LogoutRequest request = new LogoutRequest(userAuthToken);
@@ -143,7 +143,7 @@ public class ServerFacadeTests {
     public void logoutFailure(){
         serverFacade.clear(new ClearRequest());
         //Register the test user: "me" and hold onto its authtoken output
-        String userAuthToken = quickRegister();
+        String userAuthToken = quickFacadeRegister();
 
 
         //Attempt to log out using a blatantly incorrect authtoken
@@ -165,14 +165,16 @@ public class ServerFacadeTests {
     public void listGamesSuccess(){
         serverFacade.clear(new ClearRequest());
 
-        String userAuthToken = quickRegister();
-        int newGameID = quickStartGame(userAuthToken);
+        String userAuthToken = quickFacadeRegister();
+        int newGameID = quickFacadeStartGame(userAuthToken);
 
         try{
             ListRequest request = new ListRequest(userAuthToken);
             ListResult result = serverFacade.listGames(request);
 
-            Assertions.assertEquals("[GameData[gameID=1, whiteUsername=null, blackUsername=null, gameName=chess2, game=WHITE&RNBQKBNR&PPPPPPPP&********&********&********&********&pppppppp&rnbqkbnr&]]", result.games().toString());
+            Assertions.assertEquals("[GameData[gameID=1, whiteUsername=null, " +
+                    "blackUsername=null, gameName=chess2, " +
+                    "game=WHITE&RNBQKBNR&PPPPPPPP&********&********&********&********&pppppppp&rnbqkbnr&]]", result.games().toString());
 
         } catch (Exception e){
             System.out.println(e.toString());
@@ -190,7 +192,7 @@ public class ServerFacadeTests {
         serverFacade.clear(new ClearRequest());
 
         //Register the test user: "me" and hold onto its authtoken output
-        String userAuthToken = quickRegister();
+        String userAuthToken = quickFacadeRegister();
 
 
         //Attempt to make a game using a blatantly incorrect authtoken
@@ -212,7 +214,7 @@ public class ServerFacadeTests {
     @DisplayName("serverFacade: make game success test")
     public void makeGameSuccess(){
         serverFacade.clear(new ClearRequest());
-        String userAuthToken = quickRegister();
+        String userAuthToken = quickFacadeRegister();
 
         try{
             MakeGameRequest request = new MakeGameRequest(userAuthToken, "a chess game");
@@ -231,7 +233,7 @@ public class ServerFacadeTests {
     public void makeGameFailure(){
         serverFacade.clear(new ClearRequest());
         //Register the test user: "me" and hold onto its authtoken output
-        String userAuthToken = quickRegister();
+        String userAuthToken = quickFacadeRegister();
 
 
         //Attempt to make a game using a blatantly incorrect authtoken
@@ -253,8 +255,8 @@ public class ServerFacadeTests {
     @DisplayName("serverFacade: join game success test")
     public void joinGameSuccess(){
         serverFacade.clear(new ClearRequest());
-        String userAuthToken = quickRegister();
-        int newGameID = quickStartGame(userAuthToken);
+        String userAuthToken = quickFacadeRegister();
+        int newGameID = quickFacadeStartGame(userAuthToken);
 
         try{
             JoinGameRequest request = new JoinGameRequest(userAuthToken, "WHITE", newGameID);
@@ -273,8 +275,8 @@ public class ServerFacadeTests {
     public void joinGameFailure(){
         serverFacade.clear(new ClearRequest());
         //Register the test user: "me" and hold onto its authtoken output
-        String userAuthToken = quickRegister();
-        int newGameID = quickStartGame(userAuthToken);
+        String userAuthToken = quickFacadeRegister();
+        int newGameID = quickFacadeStartGame(userAuthToken);
 
 
         //Attempt to join a game using a blatantly incorrect authtoken
@@ -296,7 +298,7 @@ public class ServerFacadeTests {
     @DisplayName("serverFacade: clear test")
     public void clearserverFacadePositive(){
         serverFacade.clear(new ClearRequest());
-        String userAuthToken = quickRegister();
+        String userAuthToken = quickFacadeRegister();
 
         ClearRequest request = new ClearRequest();
         serverFacade.clear(request);
