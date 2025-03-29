@@ -13,7 +13,7 @@ public class Main {
 
         Scanner scan = new Scanner(System.in);
         String result = "";
-        while (!result.equals("<QUIT>")){
+        while (!result.startsWith("Session over")){
             result = client.eval(scan.nextLine());
             System.out.println(result);
             System.out.print(client.getPrompt());

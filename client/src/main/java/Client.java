@@ -139,13 +139,13 @@ public class Client {
             outMsg.append("- ");
             outMsg.append(gameName);
             outMsg.append(": ");
-            if (whitePlayer.equals("null")){
+            if (whitePlayer == null){
                 outMsg.append("<waiting for player>");
             } else{
                 outMsg.append(whitePlayer);
             }
             outMsg.append(" (WHITE) vs ");
-            if (blackPlayer.equals("null")){
+            if (blackPlayer == null){
                 outMsg.append("<waiting for player>");
             } else{
                 outMsg.append(blackPlayer);
@@ -252,6 +252,11 @@ public class Client {
         for (int i = 1; i < 9; i++){
             fancyString.append(numberColumn[i-1]);
             for (int j = 1; j < 9; j++){
+
+                if (team.equals("BLACK")){
+                    i = 9-i;
+                    j = 9-j;
+                }
                 if ((i+j) % 2 == 0){
                     fancyString.append(SET_BG_COLOR_WHITE);
                 } else {
@@ -267,6 +272,12 @@ public class Client {
                         fancyString.append(SET_TEXT_COLOR_BLUE);
                     }
                     fancyString.append(" " + piece.toString() + " ");
+
+                }
+
+                if (team.equals("BLACK")){
+                    i = 9-i;
+                    j = 9-j;
                 }
             }
             fancyString.append(numberColumn[i-1] + RESET_BG_COLOR + "\n");
