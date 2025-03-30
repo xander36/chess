@@ -21,6 +21,7 @@ public class Client {
     private String username = null;
     private String authToken = null;
     private GameData game = null;
+    private ChessGame.TeamColor team = null;
     private ArrayList<GameData> recentGameListing = null;
 
     public String eval(String inString){
@@ -50,9 +51,42 @@ public class Client {
                 } else if (input.startsWith("logout")) {
                     return doLogout();
                 }
+            } else if (status.equals("PLAY")) {
+                if (input.startsWith("redraw")) {
+                    return doRedraw();
+                } else if (input.startsWith("leave")) {
+                    return doLeave();
+                } else if (input.startsWith("move")) {
+                    return doMove(input);
+                } else if (input.startsWith("resign")) {
+                    return doResign();
+                } else if (input.startsWith("show")) {
+                    return doShowMoves();
+                }
             }
         }
         return "Alright Curtis you forgot to implement something";
+    }
+
+    private String doShowMoves() {
+        return "I am 4 parallel universes ahead of you";
+    }
+
+    private String doResign() {
+        return "I'm taking my ball and going home";
+    }
+
+    private String doMove(String input) {
+        return "420 iq play";
+    }
+
+    private String doLeave() {
+        status = "LOGGED_IN";
+        return "Leaving current game...";
+    }
+
+    private String doRedraw() {
+        return getBoard();
     }
 
     private String doLogout() {
@@ -76,8 +110,8 @@ public class Client {
             if (game == null){
                 return "No game with that ID";
             }
-
-            return "Lets observe game #" + parts[1] + "\n" + getBoard("WHITE");
+            team = ChessGame.TeamColor.WHITE;
+            return "Lets observe game #" + parts[1] + "\n" + getBoard();
         }
     }
 
@@ -102,8 +136,14 @@ public class Client {
                 if (game == null){
                     return "No game with that ID";
                 }
-
-                return "User " + username + " has joined game #" + game.gameID() + " as the " + parts[2] + " player" + "\n" + getBoard(parts[2]);
+                if (parts[2].equals("BLACK")){
+                    team = ChessGame.TeamColor.BLACK;
+                }
+                else if (parts[2].equals("WHITE")){
+                    team = ChessGame.TeamColor.WHITE;
+                }
+                status = "PLAY";
+                return "User " + username + " has joined game #" + game.gameID() + " as the " + parts[2] + " player" + "\n" + getBoard();
 
             } catch (ServerFacadeException e) {
                 if (e.toString().contains("taken")){
@@ -221,18 +261,18 @@ public class Client {
         return null;
     }
 
-    private String getBoard(String team){
+    private String getBoard(){
 
         String gameString = game.game().toString();
 
         StringBuilder fancyString = new StringBuilder();
         String letterRow;
         String[] numberColumn;
-        if (team.equals("WHITE")){
+        if (team == ChessGame.TeamColor.WHITE){
             letterRow = "    a  b  c  d  e  f  g  h    ";
             numberColumn = new String[]{" 8 ", " 7 ", " 6 ", " 5 ", " 4 ", " 3 ", " 2 ", " 1 "};
 
-        } else if (team.equals("BLACK")){
+        } else if (team == ChessGame.TeamColor.BLACK){
             letterRow = "    h  g  f  e  d  c  b  a     ";
             numberColumn = new String[]{" 1 ", " 2 ", " 3 ", " 4 ", " 5 ", " 6 ", " 7 ", " 8 "};
         } else{
@@ -253,7 +293,7 @@ public class Client {
             fancyString.append(numberColumn[i-1]);
             for (int j = 1; j < 9; j++){
 
-                if (team.equals("BLACK")){
+                if (team == ChessGame.TeamColor.BLACK){
                     i = 9-i;
                     j = 9-j;
                 }
@@ -275,7 +315,7 @@ public class Client {
 
                 }
 
-                if (team.equals("BLACK")){
+                if (team == ChessGame.TeamColor.BLACK){
                     i = 9-i;
                     j = 9-j;
                 }
@@ -303,6 +343,8 @@ public class Client {
             return "Valid commands:\n\tregister <username> <password> <email>\n\tlogin <username> <password>\n\tquit\n\thelp";
         }else if (status.equals("LOGGED_IN")){
             return "Valid commands:\n\tcreate <name>\n\tlist\n\tjoin <ID#> <team>\n\tobserve <ID#>\n\tlogout\n\tquit\n\thelp";
+        }else if (status.equals("PLAY")){
+            return "Valid commands:\n\tshow\n\tmove <MOVE>\n\tredraw\n\tresign\n\tleave\n\thelp";
         }
         return "You broke the FSM, there can be no help for you";
     }
