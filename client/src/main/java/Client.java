@@ -1,7 +1,4 @@
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessPiece;
-import chess.ChessPosition;
+import chess.*;
 import dataclasses.GameData;
 import facade.ServerFacade;
 import facade.ServerFacadeException;
@@ -9,6 +6,7 @@ import request.*;
 import result.*;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 import static ui.EscapeSequences.*;
 
@@ -61,15 +59,52 @@ public class Client {
                 } else if (input.startsWith("resign")) {
                     return doResign();
                 } else if (input.startsWith("show")) {
-                    return doShowMoves();
+                    return doShowMoves(input);
                 }
             }
         }
-        return "Alright Curtis you forgot to implement something";
+        return "Unknown command - check your spelling!";
     }
 
-    private String doShowMoves() {
-        return "I am 4 parallel universes ahead of you";
+    private String doShowMoves(String input) {
+        String[] parts = input.split(" ");
+
+        if (parts.length < 2){
+            return "Please provide a position for which to show legal moves";
+        } else if (parts.length > 2){
+            return "Invalid arguments";
+        } else{
+            String pos = parts[1];
+
+            if (pos.length() != 2){
+                return "Invalid position";
+            }
+
+            int col = Character.toLowerCase(pos.charAt(0)) + 1 - 'a';
+            int row = Integer.parseInt(pos.charAt(1)+"");
+
+            if (row < 1 || row > 8 || col < 1 || col > 8){
+                return "Invalid position";
+            }
+
+            ChessPosition chessPos = new ChessPosition(row, col);
+
+            Collection<ChessMove> moves = game.game().validMoves(chessPos);
+
+            String out = "";
+
+            ArrayList<ChessPosition> positions = new ArrayList<>();
+            positions.add(chessPos);
+
+            for (ChessMove move: moves){
+                positions.add(move.getEndPosition());
+            }
+
+
+
+            return getBoard(positions);
+        }
+
     }
 
     private String doResign() {
@@ -81,6 +116,8 @@ public class Client {
     }
 
     private String doLeave() {
+        //Clarify
+
         status = "LOGGED_IN";
         return "Leaving current game...";
     }
@@ -152,7 +189,6 @@ public class Client {
                     return "No game with that ID, try again";
                 }
             }
-
         }
         return null;
     }
@@ -262,6 +298,10 @@ public class Client {
     }
 
     private String getBoard(){
+        return getBoard(new ArrayList<ChessPosition>());
+    }
+
+    private String getBoard(ArrayList<ChessPosition> positions){
 
         String gameString = game.game().toString();
 
@@ -270,11 +310,11 @@ public class Client {
         String[] numberColumn;
         if (team == ChessGame.TeamColor.WHITE){
             letterRow = "    a  b  c  d  e  f  g  h    ";
-            numberColumn = new String[]{" 8 ", " 7 ", " 6 ", " 5 ", " 4 ", " 3 ", " 2 ", " 1 "};
+            numberColumn = new String[]{" 1 ", " 2 ", " 3 ", " 4 ", " 5 ", " 6 ", " 7 ", " 8 "};
 
         } else if (team == ChessGame.TeamColor.BLACK){
-            letterRow = "    h  g  f  e  d  c  b  a     ";
-            numberColumn = new String[]{" 1 ", " 2 ", " 3 ", " 4 ", " 5 ", " 6 ", " 7 ", " 8 "};
+            letterRow = "    h  g  f  e  d  c  b  a    ";
+            numberColumn = new String[]{" 8 ", " 7 ", " 6 ", " 5 ", " 4 ", " 3 ", " 2 ", " 1 "};
         } else{
             return "C'mon son";
         }
@@ -293,14 +333,33 @@ public class Client {
             fancyString.append(numberColumn[i-1]);
             for (int j = 1; j < 9; j++){
 
+
+
                 if (team == ChessGame.TeamColor.BLACK){
                     i = 9-i;
                     j = 9-j;
                 }
+
+                boolean highlightHere = false;
+
+                for (ChessPosition pos: positions){
+                    if (pos.getRow() == i && pos.getColumn() == j){
+                        highlightHere = true;
+                    }
+                }
+
                 if ((i+j) % 2 == 0){
-                    fancyString.append(SET_BG_COLOR_WHITE);
+                    if (highlightHere){
+                        fancyString.append(SET_BG_COLOR_YELLOW);
+                    }else{
+                        fancyString.append(SET_BG_COLOR_WHITE);
+                    }
                 } else {
-                    fancyString.append(SET_BG_COLOR_BLACK);
+                    if (highlightHere){
+                        fancyString.append(SET_BG_COLOR_ORANGE);
+                    }else{
+                        fancyString.append(SET_BG_COLOR_BLACK);
+                    }
                 }
                 ChessPiece piece = board.getPiece(new ChessPosition(i, j));
                 if (piece == null){
@@ -344,7 +403,7 @@ public class Client {
         }else if (status.equals("LOGGED_IN")){
             return "Valid commands:\n\tcreate <name>\n\tlist\n\tjoin <ID#> <team>\n\tobserve <ID#>\n\tlogout\n\tquit\n\thelp";
         }else if (status.equals("PLAY")){
-            return "Valid commands:\n\tshow\n\tmove <MOVE>\n\tredraw\n\tresign\n\tleave\n\thelp";
+            return "Valid commands:\n\tshow <position>\n\tmove <MOVE>\n\tredraw\n\tresign\n\tleave\n\thelp";
         }
         return "You broke the FSM, there can be no help for you";
     }

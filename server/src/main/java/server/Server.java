@@ -1,8 +1,6 @@
 package server;
 import dataaccess.*;
-import handler.ClearHandler;
-import handler.GameHandler;
-import handler.UserHandler;
+import handler.*;
 import service.*;
 import spark.*;
 
@@ -19,7 +17,6 @@ public class Server {
 
 
     public int run(int desiredPort) {
-
         UserDAO userAccess = new DatabaseUserDAO();
         AuthDAO authAccess = new DatabaseAuthDAO();
         GameDAO gameAccess = new DatabaseGameDAO();
