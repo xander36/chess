@@ -1,7 +1,8 @@
+package principal;
+
 import chess.*;
 import dataclasses.GameData;
-import facade.ServerFacade;
-import facade.ServerFacadeException;
+import facade.*;
 import request.*;
 import result.*;
 
@@ -12,7 +13,7 @@ import static ui.EscapeSequences.*;
 
 public class Client {
 
-    private ServerFacade serverFacade = new ServerFacade("http://localhost:8080");
+
 
     private String status = "LOGGED_OUT";
     private boolean running = true;
@@ -21,6 +22,10 @@ public class Client {
     private GameData game = null;
     private ChessGame.TeamColor team = null;
     private ArrayList<GameData> recentGameListing = null;
+
+    String url = "http://localhost:8080";
+    private ServerFacade serverFacade = new ServerFacade(url);
+    private WebSocketFacade webSocketFacade = new WebSocketFacade(url, new WebRepl(url, this));
 
     public String eval(String inString){
         String input = inString.trim();

@@ -1,4 +1,5 @@
 import chess.*;
+import principal.Client;
 
 import java.util.Scanner;
 
@@ -7,7 +8,7 @@ public class Main {
         Client client = new Client();
 
         var piece = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
-        System.out.println("♕ 240 Chess Client: " + piece);
+        System.out.println("♕ 240 Chess principal.Client: " + piece);
 
         System.out.print("Welcome!\n" + client.getPrompt());
 
