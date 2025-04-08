@@ -36,6 +36,8 @@ public class Server {
         Spark.staticFiles.location("web");
         Gson gson = new Gson();
 
+        Spark.webSocket("/ws", wsHandler);
+
         Spark.post("/user", (req, res) -> {return userHandler.register(req, res);});
 
         Spark.post("/session", (req, res) -> {return userHandler.login(req, res);});
@@ -49,6 +51,7 @@ public class Server {
         Spark.put("/game", (req, res) -> {return gameHandler.joinGame(req, res);});
 
         Spark.delete("/db", (req, res) -> {return clearHandler.clear(req, res);});
+
 
         Spark.awaitInitialization();
         return Spark.port();
