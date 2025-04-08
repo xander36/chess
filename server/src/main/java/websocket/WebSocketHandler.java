@@ -1,5 +1,6 @@
 package websocket;
 
+import chess.ChessMove;
 import com.google.gson.Gson;
 import websocket.messages.Action;
 import websocket.messages.Notification;
@@ -26,17 +27,41 @@ public class WebSocketHandler {
     public void onMessage(Session session, String message) throws IOException {
         Action action = new Gson().fromJson(message, Action.class);
         switch (action.type()) {
-            case RESIGN -> enter(action.username(), session);
-            case LEAVE -> exit(action.username());
+            case RESIGN -> resign(action.username());
+            case LEAVE -> leave(action.username());
+            case MOVE -> move(action.username(), action.move());
         }
     }
 
+    private void resign(String username) throws IOException {
+        var message = String.format("%s resigned", username);
+        var notification = new Notification(Notification.Type.RESIGN, message);
+        connections.broadcast(username, notification);
+    }
+
+    private void leave(String username) throws IOException {
+        var message = String.format("%s left", username);
+        var notification = new Notification(Notification.Type.RESIGN, message);
+        connections.broadcast(username, notification);
+    }
+
+    private void move(String username, ChessMove move) throws IOException {
+        var message = String.format("%s %s", username, move);
+        var notification = new Notification(Notification.Type.RESIGN, message);
+        connections.broadcast(username, notification);
+    }
+
+
+
+    /*
     private void enter(String visitorName, Session session) throws IOException {
         connections.add(visitorName, session);
         var message = String.format("%s is in the shop", visitorName);
         var notification = new Notification(Notification.Type.ARRIVAL, message);
         connections.broadcast(visitorName, notification);
     }
+
+
 
     private void exit(String visitorName) throws IOException {
         connections.remove(visitorName);
@@ -54,4 +79,6 @@ public class WebSocketHandler {
             throw new WebSocketException(500, ex.getMessage());
         }
     }
+    */
+
 }
