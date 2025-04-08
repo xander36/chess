@@ -5,9 +5,7 @@ import com.google.gson.Gson;
 
 public record Action(Type type, String username, ChessMove move) {
     public enum Type {
-        LEAVE,
-        RESIGN,
-        MOVE
+        WURT
     }
 
     public String toString() {

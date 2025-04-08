@@ -30,7 +30,7 @@ public class Server {
         this.clearHandler = new ClearHandler(userService, clearService, gameService);
         this.gameHandler = new GameHandler(userService, clearService, gameService);
 
-        this.wsHandler = new WebSocketHandler();
+        this.wsHandler = new WebSocketHandler(userAccess, authAccess, gameAccess);
 
         Spark.port(desiredPort);
         Spark.staticFiles.location("web");

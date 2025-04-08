@@ -3,7 +3,9 @@ package facade;
 
 import chess.ChessMove;
 import com.google.gson.Gson;
-import websocket.messages.*;
+import websocket.commands.MakeMoveCommand;
+import websocket.commands.UserGameCommand;
+import websocket.messages.Notification;
 
 import javax.websocket.*;
 import java.io.IOException;
@@ -43,27 +45,33 @@ public class WebSocketFacade extends Endpoint {
     public void onOpen(Session session, EndpointConfig endpointConfig) {
     }
 
-    public void leaveGame(String username) throws WebSocketException {
-        var action = new Action(Action.Type.LEAVE, username, null);
-        sendAction(action);
+    public void leaveGame(String authToken, int gameID) throws WebSocketException {
+        var action = new UserGameCommand(UserGameCommand.CommandType.LEAVE, authToken, gameID);
+        sendObject(action);
     }
 
-    public void resign(String username) throws WebSocketException {
-        var action = new Action(Action.Type.RESIGN, username, null);
-        sendAction(action);
+    public void resign(String authToken, int gameID) throws WebSocketException {
+        var action = new UserGameCommand(UserGameCommand.CommandType.RESIGN, authToken, gameID);
+        sendObject(action);
     }
 
-    public void move(String username, ChessMove move) throws WebSocketException{
-        var action = new Action(Action.Type.MOVE, username, move);
-        sendAction(action);
+    public void move(String authToken, int gameID, ChessMove move) throws WebSocketException{
+        var action = new MakeMoveCommand(authToken, gameID, move);
+        sendObject(action);
     }
 
-    private void sendAction (Action action) throws WebSocketException {
+    public void connect(String username, String authToken, int gameID)throws WebSocketException{
+        var command = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID);
+        sendObject(command);
+    }
+
+    private void sendObject (Object obj) throws WebSocketException {
         try {
-            this.session.getBasicRemote().sendText(new Gson().toJson(action));
+            this.session.getBasicRemote().sendText(new Gson().toJson(obj));
         } catch (IOException ex) {
             throw new WebSocketException(500, ex.getMessage());
         }
     }
+
 
 }

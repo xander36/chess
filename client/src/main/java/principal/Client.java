@@ -25,9 +25,11 @@ public class Client {
     private ServerFacade serverFacade;
     private WebSocketFacade webSocketFacade;
 
+    private Repl repl;
+
     public Client(String url, Repl repl){
         serverFacade  = new ServerFacade(url);
-        webSocketFacade = new  WebSocketFacade(url, repl);
+        this.repl = repl;
     }
 
     public String eval(String inString){
@@ -117,7 +119,7 @@ public class Client {
 
     private String doResign() {
         try {
-            webSocketFacade.resign(username);
+            webSocketFacade.resign(authToken, game.gameID());
             status = "LOGGED_IN";
             return "imma resign";
         } catch (WebSocketException e) {
@@ -130,7 +132,7 @@ public class Client {
 
         try {
 
-            webSocketFacade.move(username, move);
+            webSocketFacade.move(authToken, game.gameID(), move);
             status = "LOGGED_IN";
             return "imma resign";
         } catch (WebSocketException e) {
@@ -140,7 +142,7 @@ public class Client {
 
     private String doLeave() {
         try {
-            webSocketFacade.leaveGame(username);
+            webSocketFacade.leaveGame(authToken, game.gameID());
             status = "LOGGED_IN";
             return "Left current game";
         } catch (WebSocketException e) {
@@ -206,6 +208,10 @@ public class Client {
                     team = ChessGame.TeamColor.WHITE;
                 }
                 status = "PLAY";
+
+                webSocketFacade = new WebSocketFacade(url, repl);
+                webSocketFacade.connect(username, authToken, gameID);
+
                 return "User " + username + " has joined game #" + game.gameID() + " as the " + parts[2] + " player" + "\n" + getBoard();
 
             } catch (ServerFacadeException e) {
@@ -214,6 +220,8 @@ public class Client {
                 } else if (e.toString().contains("bad")){
                     return "No game with that ID, try again";
                 }
+            } catch (WebSocketException e){
+                return "Websocket didn't work and its definitely Alex's fault";
             }
         }
         return null;

@@ -2,9 +2,11 @@ package websocket;
 
 import chess.ChessMove;
 import com.google.gson.Gson;
-import websocket.messages.Action;
-import websocket.messages.Notification;
-import websocket.messages.Action;
+import service.ClearService;
+import service.GameService;
+import service.UserService;
+import websocket.commands.UserGameCommand;
+import websocket.messages.*;
 
 import dataaccess.*;
 import org.eclipse.jetty.websocket.api.Session;
@@ -23,26 +25,40 @@ public class WebSocketHandler {
 
     private final ConnectionManager connections = new ConnectionManager();
 
+    UserDAO userDAO;
+    AuthDAO authDAO;
+    GameDAO gameDAO;
+
+
+    public WebSocketHandler(UserDAO userDAO, AuthDAO authDAO, GameDAO gameDAO){
+        this.userDAO = userDAO;
+        this.authDAO = authDAO;
+        this.gameDAO = gameDAO;
+    }
+
+
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws IOException {
-        Action action = new Gson().fromJson(message, Action.class);
-        switch (action.type()) {
-            case RESIGN -> resign(action.username());
-            case LEAVE -> leave(action.username());
-            case MOVE -> move(action.username(), action.move());
+        UserGameCommand msg = new Gson().fromJson(message, UserGameCommand.class);
+        switch (msg.getCommandType()) {
+            case RESIGN -> resign(msg.getAuthToken(), msg.getGameID());
+            case LEAVE -> leave(msg.getAuthToken(), msg.getGameID());
+            //case MOVE -> move(action.username(), action.move());
+
+
         }
     }
 
-    private void resign(String username) throws IOException {
-        var message = String.format("%s resigned", username);
+    private void resign(String authToken, int gameID) throws IOException {
+        var message = "";
         var notification = new Notification(Notification.Type.RESIGN, message);
-        connections.broadcast(username, notification);
+        connections.broadcast(null, notification);
     }
 
-    private void leave(String username) throws IOException {
-        var message = String.format("%s left", username);
-        var notification = new Notification(Notification.Type.RESIGN, message);
-        connections.broadcast(username, notification);
+    private void leave(String username, int gameID) throws IOException {
+        var message = "";
+        var notification = new Notification(Notification.Type.LEAVE, message);
+        connections.broadcast(null, notification);
     }
 
     private void move(String username, ChessMove move) throws IOException {
