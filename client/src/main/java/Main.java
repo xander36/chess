@@ -1,26 +1,14 @@
-import chess.*;
-import principal.Client;
-
-import java.util.Scanner;
+import principal.Repl;
 
 public class Main {
+
     public static void main(String[] args) {
-        Client client = new Client();
-
-        var piece = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
-        System.out.println("♕ 240 Chess principal.Client: " + piece);
-
-        System.out.print("Welcome!\n" + client.getPrompt());
-
-        Scanner scan = new Scanner(System.in);
-        String result = "";
-        while (!result.startsWith("Session over")){
-            result = client.eval(scan.nextLine());
-            System.out.println(result);
-            System.out.print(client.getPrompt());
+        var serverUrl = "http://localhost:8080";
+        if (args.length == 1) {
+            serverUrl = args[0];
         }
-
-        System.out.println();
-
+        new Repl(serverUrl).run();
     }
+
+
 }

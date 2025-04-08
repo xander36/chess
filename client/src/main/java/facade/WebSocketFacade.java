@@ -1,6 +1,7 @@
 package facade;
 
 
+import chess.ChessMove;
 import com.google.gson.Gson;
 import websocket.messages.*;
 
@@ -38,25 +39,28 @@ public class WebSocketFacade extends Endpoint {
         }
     }
 
-    //Endpoint requires this method, but you don't have to do anything
     @Override
     public void onOpen(Session session, EndpointConfig endpointConfig) {
     }
 
-    public void enterPetShop(String visitorName) throws WebSocketException {
-        try {
-            var action = new Action(Action.Type.ENTER, visitorName);
-            this.session.getBasicRemote().sendText(new Gson().toJson(action));
-        } catch (IOException ex) {
-            throw new WebSocketException(500, ex.getMessage());
-        }
+    public void leaveGame(String username) throws WebSocketException {
+        var action = new Action(Action.Type.LEAVE, username, null);
+        sendAction(action);
     }
 
-    public void leavePetShop(String visitorName) throws WebSocketException {
+    public void resign(String username) throws WebSocketException {
+        var action = new Action(Action.Type.RESIGN, username, null);
+        sendAction(action);
+    }
+
+    public void move(String username, ChessMove move) throws WebSocketException{
+        var action = new Action(Action.Type.MOVE, username, move);
+        sendAction(action);
+    }
+
+    private void sendAction (Action action) throws WebSocketException {
         try {
-            var action = new Action(Action.Type.EXIT, visitorName);
             this.session.getBasicRemote().sendText(new Gson().toJson(action));
-            this.session.close();
         } catch (IOException ex) {
             throw new WebSocketException(500, ex.getMessage());
         }

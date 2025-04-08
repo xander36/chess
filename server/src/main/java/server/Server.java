@@ -3,6 +3,7 @@ import dataaccess.*;
 import handler.*;
 import service.*;
 import spark.*;
+import websocket.WebSocketHandler;
 
 import java.util.ArrayList;
 
@@ -15,6 +16,8 @@ public class Server {
     private ClearHandler clearHandler;
     private GameHandler gameHandler;
 
+    private WebSocketHandler wsHandler;
+
 
     public int run(int desiredPort) {
         UserDAO userAccess = new DatabaseUserDAO();
@@ -23,10 +26,11 @@ public class Server {
         UserService userService = new UserService(userAccess, authAccess, gameAccess);
         ClearService clearService = new ClearService(userAccess, authAccess, gameAccess);
         GameService gameService = new GameService(userAccess, authAccess, gameAccess);
-
         this.userHandler = new UserHandler(userService, clearService, gameService);
         this.clearHandler = new ClearHandler(userService, clearService, gameService);
         this.gameHandler = new GameHandler(userService, clearService, gameService);
+
+        this.wsHandler = new WebSocketHandler();
 
         Spark.port(desiredPort);
         Spark.staticFiles.location("web");

@@ -12,9 +12,6 @@ import java.util.Collection;
 import static ui.EscapeSequences.*;
 
 public class Client {
-
-
-
     private String status = "LOGGED_OUT";
     private boolean running = true;
     private String username = null;
@@ -23,9 +20,14 @@ public class Client {
     private ChessGame.TeamColor team = null;
     private ArrayList<GameData> recentGameListing = null;
 
-    String url = "http://localhost:8080";
-    private ServerFacade serverFacade = new ServerFacade(url);
-    private WebSocketFacade webSocketFacade = new WebSocketFacade(url, new WebRepl(url, this));
+    String url;
+    private ServerFacade serverFacade;
+    private WebSocketFacade webSocketFacade;
+
+    public Client(String url, Repl repl){
+        serverFacade  = new ServerFacade(url);
+        webSocketFacade = new  WebSocketFacade(url, repl);
+    }
 
     public String eval(String inString){
         String input = inString.trim();
@@ -113,18 +115,36 @@ public class Client {
     }
 
     private String doResign() {
-        return "I'm taking my ball and going home";
+        try {
+            webSocketFacade.resign(username);
+            status = "LOGGED_IN";
+            return "imma resign";
+        } catch (WebSocketException e) {
+            return "I didnt because " + e.toString();
+        }
     }
 
     private String doMove(String input) {
-        return "420 iq play";
+        ChessMove move = null;
+
+        try {
+
+            webSocketFacade.move(username, move);
+            status = "LOGGED_IN";
+            return "imma resign";
+        } catch (WebSocketException e) {
+            return "I didnt because " + e.toString();
+        }
     }
 
     private String doLeave() {
-        //Clarify
-
-        status = "LOGGED_IN";
-        return "Leaving current game...";
+        try {
+            webSocketFacade.leaveGame(username);
+            status = "LOGGED_IN";
+            return "Left current game";
+        } catch (WebSocketException e) {
+            return "I didnt because " + e.toString();
+        }
     }
 
     private String doRedraw() {
