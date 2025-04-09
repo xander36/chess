@@ -52,7 +52,6 @@ public class DatabaseGameDAO implements GameDAO {
         try (var conn = DatabaseManager.getConnection()) {
             String addStatement = "TRUNCATE TABLE game";
             try (var preparedStatement = conn.prepareStatement(addStatement)) {
-                System.out.println(preparedStatement.toString());
                 var rs = preparedStatement.executeUpdate();
                 size = 0;
             }
@@ -70,7 +69,6 @@ public class DatabaseGameDAO implements GameDAO {
         try (var conn = DatabaseManager.getConnection()) {
             String addStatement = "SELECT gameID, whiteUsername, blackUsername, gameName, game FROM game";
             try (var preparedStatement = conn.prepareStatement(addStatement)) {
-                System.out.println(preparedStatement.toString());
                 var rs = preparedStatement.executeQuery();
 
                 while (rs.next()) {
@@ -107,8 +105,6 @@ public class DatabaseGameDAO implements GameDAO {
         }
 
         int newId = size+1;
-        System.out.println("Make number");
-        System.out.println(newId);
         GameData newGame = new GameData(newId, null, null, gameName, new ChessGame());
 
         try (var conn = DatabaseManager.getConnection()) {
@@ -120,7 +116,6 @@ public class DatabaseGameDAO implements GameDAO {
                 preparedStatement.setString(4, newGame.gameName());
                 preparedStatement.setString(5, newGame.game().toString());
 
-                System.out.println(preparedStatement.toString());
 
                 var rs = preparedStatement.executeUpdate();
 
@@ -137,7 +132,6 @@ public class DatabaseGameDAO implements GameDAO {
             String addStatement = "SELECT whiteUsername, blackUsername, gameName, game FROM game WHERE gameID = ?";
             try (var preparedStatement = conn.prepareStatement(addStatement)) {
                 preparedStatement.setInt(1, gameID);
-                System.out.println(preparedStatement.toString());
                 var rs = preparedStatement.executeQuery();
                 if (rs.next()) {
 
@@ -171,7 +165,6 @@ public class DatabaseGameDAO implements GameDAO {
                 preparedStatement.setString(2, newGame.blackUsername());
                 preparedStatement.setString(3, newGame.gameName());
 
-                System.out.println(preparedStatement.toString());
                 if (newGame.game() == null){
                     preparedStatement.setString(4, "null");
                 }else {
@@ -180,7 +173,6 @@ public class DatabaseGameDAO implements GameDAO {
 
                 preparedStatement.setInt(5, gameID);
                 var rs = preparedStatement.executeUpdate();
-                System.out.println(rs);
 
                 if (rs == 0){
                     throw new DataAccessException("Invalid update, no rows altered");

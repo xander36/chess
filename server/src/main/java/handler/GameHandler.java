@@ -33,10 +33,8 @@ public class GameHandler {
     }
 
     public String listGames(Request req, Response res) {
-        System.out.println("I want a list");
         String authToken = req.headers("Authorization");
 
-        System.out.println("List authorized by " + authToken);
         ListRequest request = new ListRequest(authToken);
 
         try {
@@ -54,11 +52,9 @@ public class GameHandler {
     }
 
     public String makeGame(Request req, Response res) {
-        System.out.println("make a game?");
         res.type("application/json");
 
         String authToken = req.headers("Authorization");
-        System.out.println("handler claims to be authorized by the request's authToken " + authToken);
         JsonObject jsonObject = gson.fromJson(req.body(), JsonObject.class);
         String gameName = jsonObject.get("gameName").getAsString();
 

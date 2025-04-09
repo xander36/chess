@@ -18,7 +18,6 @@ public class WebSocketFacade extends Endpoint {
     Session session;
     NotificationHandler notificationHandler;
 
-
     public WebSocketFacade(String url, NotificationHandler notificationHandler) {
         try {
             url = url.replace("http", "ws");
@@ -32,6 +31,7 @@ public class WebSocketFacade extends Endpoint {
             this.session.addMessageHandler(new MessageHandler.Whole<String>() {
                 @Override
                 public void onMessage(String message) {
+                    System.out.println("avst, it be arriving on cliently shores");
                     Notification notification = new Gson().fromJson(message, Notification.class);
                     notificationHandler.notify(notification);
                 }
@@ -60,12 +60,13 @@ public class WebSocketFacade extends Endpoint {
         sendObject(action);
     }
 
-    public void connect(String username, String authToken, int gameID)throws WebSocketException{
+    public void connect(String authToken, int gameID)throws WebSocketException{
         var command = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID);
         sendObject(command);
     }
 
     private void sendObject (Object obj) throws WebSocketException {
+        System.out.println("send");
         try {
             this.session.getBasicRemote().sendText(new Gson().toJson(obj));
         } catch (IOException ex) {

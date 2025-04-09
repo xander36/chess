@@ -38,25 +38,18 @@ public class DatabaseUserDAO implements UserDAO {
     }
 
     public UserData getUser(String username) throws DataAccessException{
-        System.out.println("get");
         try (var conn = DatabaseManager.getConnection()) {
 
-            System.out.println("connection made");
             String addStatement = "SELECT username, password, email FROM user WHERE username = ?";
             try (var preparedStatement = conn.prepareStatement(addStatement)) {
-                System.out.println("teterent ready");
                 preparedStatement.setString(1, username);
                 var rs = preparedStatement.executeQuery();
-                System.out.println("query executed");
                 if (!rs.next()) {
-                    System.out.println("no user with name");
                     throw new DataAccessException("No user with that name");
                 } else {
-                    System.out.println("got it");
                     String password = rs.getString(2);
                     String email = rs.getString(3);
 
-                    System.out.println("successful");
                     return new UserData(username, password, email);
                 }
             }
@@ -66,7 +59,6 @@ public class DatabaseUserDAO implements UserDAO {
     }
 
     public void createUser(UserData user) throws DataAccessException{
-        System.out.println("creation prep");
         boolean usernameAvailable = true;
         try {
             getUser(user.username());
@@ -80,19 +72,15 @@ public class DatabaseUserDAO implements UserDAO {
             throw new DataAccessException("username unavailable");
         }
 
-        System.out.println("creation time");
 
         try (var conn = DatabaseManager.getConnection()) {
-            System.out.println("connection made");
             String addStatement = "INSERT INTO user (username, password, email) VALUES (?, ?, ?)";
             try (var preparedStatement = conn.prepareStatement(addStatement)) {
-                System.out.println("teterent ready");
                 preparedStatement.setString(1, user.username());
                 preparedStatement.setString(2, user.password());
                 preparedStatement.setString(3, user.email());
 
                 var rs = preparedStatement.executeUpdate();
-                System.out.println("insert complete");
                 return;
             }
         } catch (SQLException ee) {
@@ -108,7 +96,6 @@ public class DatabaseUserDAO implements UserDAO {
                 var rs = preparedStatement.executeUpdate();
             }
         } catch (Exception e) {
-            System.out.println("error");
             throw new RuntimeException(e);
         }
     }

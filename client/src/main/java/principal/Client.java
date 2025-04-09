@@ -210,7 +210,7 @@ public class Client {
                 status = "PLAY";
 
                 webSocketFacade = new WebSocketFacade(url, repl);
-                webSocketFacade.connect(username, authToken, gameID);
+                webSocketFacade.connect(authToken, gameID);
 
                 return "User " + username + " has joined game #" + game.gameID() + " as the " + parts[2] + " player" + "\n" + getBoard();
 

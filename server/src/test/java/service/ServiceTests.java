@@ -85,7 +85,6 @@ public class ServiceTests {
         //Register a user
         RegisterRequest request = new RegisterRequest("me", "you lol", "me@gmail.com");
         try {
-            System.out.println("try register");
             userService.register(request);
         } catch (Exception e){
             //In this test it is assumed that registering to a blank database will always work, so this block is blank
