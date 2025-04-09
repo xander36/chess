@@ -26,13 +26,9 @@ public class ConnectionManager {
     }
 
     public void sendMessage(String sendUsername, ServerMessage msg) throws IOException{
-        System.out.println("sending message");
-        System.out.println(sendUsername);
-        System.out.println(msg);
         for (var c : connections.values()) {
             if (c.session.isOpen()) {
                 if (c.username.equals(sendUsername)) {
-                    System.out.println("how do you spell esgeti");
                     c.send(gson.toJson(msg));
                 }
             }
@@ -40,13 +36,11 @@ public class ConnectionManager {
     }
 
     public void broadcastMessageToGame(String exceptUsername, int gameID, ServerMessage msg) throws IOException{
-        System.out.println("broadcast to " + gameID);
         var removeList = new ArrayList<Connection>();
         for (var c : connections.values()) {
             if (c.session.isOpen()) {
                 if (!c.username.equals(exceptUsername)) {
                     if (c.gameID == gameID){
-                        System.out.println("I sent it to " + c.username);
                             c.send(gson.toJson(msg));
                     }
                 }

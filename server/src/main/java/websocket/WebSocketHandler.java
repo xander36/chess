@@ -36,21 +36,16 @@ public class WebSocketHandler {
 
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws IOException {
-        System.out.println("Got message from ");
         var msg = gson.fromJson(message, UserGameCommand.class);
         if (msg.getCommandType() == UserGameCommand.CommandType.MAKE_MOVE){
             msg = gson.fromJson(message, MakeMoveCommand.class);
         }
-        System.out.println(msg.getAuthToken());
         String authToken = msg.getAuthToken();
         int gameID = msg.getGameID();
         String username;
         try {
-            System.out.println("we get a name for this guy");
             username = authDAO.getAuth(authToken).username();
-            System.out.println("and do it respectfully");
         } catch (DataAccessException e){
-            System.out.println("he's a ghost");
             var errMsg = new ErrorMessage("You found the creator's dark vision");
 
             session.getRemote().sendString(gson.toJson(errMsg));
@@ -63,10 +58,7 @@ public class WebSocketHandler {
             //case RESIGN -> resign(msg.getAuthToken(), msg.getGameID());
             //case LEAVE -> leave(msg.getAuthToken(), msg.getGameID());
             case MAKE_MOVE:
-                System.out.println("we move------------------------------------------");
-                System.out.println(msg);
                 if (msg instanceof MakeMoveCommand moveMsg){
-                    System.out.println("cast works");
                     move(username, gameID, moveMsg.move);
                 }
                 break;
@@ -75,15 +67,12 @@ public class WebSocketHandler {
     }
 
     private void connect(String username, String authToken, int gameID, Session sesh) throws IOException{
-        System.out.println("connection");
         connections.add(username, gameID, sesh);
 
         try {
             //Verify that these two exist
             var game = gameDAO.getGame(gameID);
-            System.out.println("lets check their auth");
             var auth = authDAO.getAuth(authToken);
-            System.out.println(auth);
 
             var message = "";
             ServerMessage notification = new LoadGameMessage(game);
@@ -92,8 +81,6 @@ public class WebSocketHandler {
             connections.broadcastMessageToGame(username, gameID, notification);
 
         } catch (DataAccessException e) {
-            System.out.println("checkers in the connector tripped:");
-            System.out.println(e.toString());
             if (e.toString().contains("No game with that ID")) {
                 ServerMessage notification = new ErrorMessage("Bad GameID");
                 connections.sendMessage(username, notification);
@@ -106,33 +93,44 @@ public class WebSocketHandler {
     }
 
     private void move(String username, int gameID, ChessMove move) throws IOException{
+        System.out.println("MOOOOOVEEE");
+        System.out.println(username);
+        System.out.println("Is going to do: " + move);
         try {
             var game = gameDAO.getGame(gameID);
             var board = game.game().getBoard();
             var piece = board.getPiece(move.getStartPosition());
 
+
+            if (!(game.game().validMoves(move.getStartPosition()).contains(move))){
+                connections.sendMessage(username, new ErrorMessage("Not a valid move"));
+                return;
+            }
+
             String whitePlayer = game.whiteUsername();
             String blackPlayer = game.blackUsername();
 
+            if (username.equals(whitePlayer) && piece.getTeamColor() == ChessGame.TeamColor.BLACK){
+                connections.sendMessage(username, new ErrorMessage("That is a move for the other team"));
+                return;
+            } else if (username.equals(blackPlayer) && piece.getTeamColor() == ChessGame.TeamColor.WHITE){
+                connections.sendMessage(username, new ErrorMessage("That is a move for the other team"));
+                return;
+            }
 
-
-            if (username.equals(blackPlayer)){
-                System.out.println("playing black");
-                if(game.game().isInCheckmate(ChessGame.TeamColor.BLACK)) {
-                    connections.sendMessage(username, new ErrorMessage("The game is over. No further moves can be made"));
-                    return;
-                }
-            } else if (username.equals(whitePlayer)){
-                System.out.println("playing white");
-                if(game.game().isInCheckmate(ChessGame.TeamColor.WHITE)) {
-                    connections.sendMessage(username, new ErrorMessage("The game is over. No further moves can be made"));
-                    return;
-                }
+            if(game.game().isInCheckmate(ChessGame.TeamColor.WHITE) || game.game().isInCheckmate(ChessGame.TeamColor.BLACK)) {
+                connections.sendMessage(username, new ErrorMessage("The game is over. No further moves can be made"));
+                return;
             }
 
 
+
+
+
             board.addPiece(move.getStartPosition(), null);
+
             board.addPiece(move.getEndPosition(), piece);
+
 
             game.game().setBoard(board);
             gameDAO.updateGame(gameID, game);

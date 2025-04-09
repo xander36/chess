@@ -71,16 +71,15 @@ public class ChessGame {
         }
         Collection<ChessMove> moves = piece.pieceMoves(board, startPosition);
         Collection<ChessMove> validMoves = new ArrayList<>();
-        ChessBoard oldBoard = new ChessBoard(board);
 
         for (ChessMove move : moves){
-            board.addPiece(move.getEndPosition(), piece);
-            board.addPiece(move.getStartPosition(), null);
+            ChessBoard simulatedBoard = new ChessBoard(board);
+            simulatedBoard.addPiece(move.getEndPosition(), new ChessPiece(piece));
+            simulatedBoard.addPiece(move.getStartPosition(), null);
 
-            if (!isInCheck(piece.getTeamColor())){
+            if (!isInCheck(piece.getTeamColor(), simulatedBoard)){
                 validMoves.add(move);
             }
-            board = new ChessBoard(oldBoard);
         }
 
 
@@ -173,15 +172,23 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
+        return isInCheck(teamColor, this.board);
+    }
+
+    public boolean isInCheck(TeamColor teamColor, ChessBoard inBoard){
+        //System.out.println("Check check");
+
+        //System.out.println(board.toString().replaceAll("&", "\n"));
+
         ChessPosition kingTestPos = null;
         ChessPosition kingPos = null;
         for (int i = 1; i < 9; i++){
             for (int j = 1; j <9; j++) {
                 kingTestPos = new ChessPosition(i, j);
 
-                if (board.getPiece(kingTestPos) != null &&
-                        board.getPiece(kingTestPos).getPieceType() == ChessPiece.PieceType.KING &&
-                        board.getPiece(kingTestPos).getTeamColor() == teamColor) {
+                if (inBoard.getPiece(kingTestPos) != null &&
+                        inBoard.getPiece(kingTestPos).getPieceType() == ChessPiece.PieceType.KING &&
+                        inBoard.getPiece(kingTestPos).getTeamColor() == teamColor) {
                     kingPos = kingTestPos;
                     break;
                 }
@@ -193,7 +200,7 @@ public class ChessGame {
         for (int i = 1; i < 9; i++){
             for (int j = 1; j <9; j++) {
                 testPos = new ChessPosition(i,j);
-                testPiece = board.getPiece(testPos);
+                testPiece = inBoard.getPiece(testPos);
 
                 if (testPiece == null){
                     continue;
@@ -205,7 +212,7 @@ public class ChessGame {
 //                }
 
                 //Collection<ChessMove> moveset = validMoves(testPos);
-                Collection<ChessMove> moveset = testPiece.pieceMoves(board, testPos);
+                Collection<ChessMove> moveset = testPiece.pieceMoves(inBoard, testPos);
 
                 if (moveset == null){
                     continue;
