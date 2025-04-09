@@ -68,10 +68,7 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        System.out.println("Valid moves at "+ startPosition);
         ChessPiece piece = board.getPiece(startPosition);
-        System.out.println(piece);
-        System.out.println(board.toString().replaceAll("&", "\n"));
 
         if (piece == null){
             return new ArrayList<ChessMove>();

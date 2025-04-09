@@ -170,9 +170,9 @@ public class WebSocketHandler {
             } else if (game.game().isInCheckmate(ChessGame.TeamColor.WHITE)){
                 connections.broadcastToAll(null, new NotificationMessage(blackPlayer + " has checkmated " + whitePlayer + "!"));
             } else if (game.game().isInCheck(ChessGame.TeamColor.BLACK)){
-                connections.broadcastToAll(blackPlayer, new NotificationMessage(whitePlayer + " has checked " + blackPlayer + "!"));
+                connections.broadcastToAll(null, new NotificationMessage(whitePlayer + " has checked " + blackPlayer + "!"));
             } else if (game.game().isInCheck(ChessGame.TeamColor.WHITE)){
-                connections.broadcastToAll(whitePlayer, new NotificationMessage(blackPlayer + " has checked " + whitePlayer + "!"));
+                connections.broadcastToAll(null, new NotificationMessage(blackPlayer + " has checked " + whitePlayer + "!"));
             }
 
 

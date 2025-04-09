@@ -136,9 +136,6 @@ public class Client {
             return "Invalid move, try again";
         }
 
-        startPos = new ChessPosition(startPos.getRow(), 9-startPos.getColumn());
-        endPos = new ChessPosition(endPos.getRow(), 9-endPos.getColumn());
-
         ChessPiece.PieceType type = null;
         if (chessSyntax.length() == 5){
             switch (chessSyntax.charAt(4)){
@@ -386,6 +383,8 @@ public class Client {
             for (int j = 1; j < 9; j++){
                 if (team == ChessGame.TeamColor.WHITE){
                     i = 9-i;
+                    //j = 9-j;
+                } else{
                     j = 9-j;
                 }
 
@@ -395,7 +394,9 @@ public class Client {
                         highlightHere = true;
                     }
                 }
-                if ((i+j) % 2 == 0){
+                boolean lightSquare = (i+j) % 2 == 1;
+                //if (team == ChessGame.TeamColor.BLACK){lightSquare = (i+j) % 2 == 0;}
+                if (lightSquare){
                     if (highlightHere){
                         fancyString.append(SET_BG_COLOR_YELLOW);
                     }else{
@@ -421,6 +422,8 @@ public class Client {
                 }
                 if (team == ChessGame.TeamColor.WHITE){
                     i = 9-i;
+                    //j = 9-j;
+                }else{
                     j = 9-j;
                 }
             }
