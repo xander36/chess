@@ -45,32 +45,32 @@ public class WebSocketFacade extends Endpoint {
     public void onOpen(Session session, EndpointConfig endpointConfig) {
     }
 
-    public void leaveGame(String authToken, int gameID) throws WebSocketException {
+    public void leaveGame(String authToken, int gameID) throws WebSocketFacadeException {
         var action = new UserGameCommand(UserGameCommand.CommandType.LEAVE, authToken, gameID);
         sendObject(action);
     }
 
-    public void resign(String authToken, int gameID) throws WebSocketException {
+    public void resign(String authToken, int gameID) throws WebSocketFacadeException {
         var action = new UserGameCommand(UserGameCommand.CommandType.RESIGN, authToken, gameID);
         sendObject(action);
     }
 
-    public void move(String authToken, int gameID, ChessMove move) throws WebSocketException{
+    public void move(String authToken, int gameID, ChessMove move) throws WebSocketFacadeException {
         var action = new MakeMoveCommand(authToken, gameID, move);
         sendObject(action);
     }
 
-    public void connect(String authToken, int gameID)throws WebSocketException{
+    public void connect(String authToken, int gameID)throws WebSocketFacadeException {
         var command = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID);
         sendObject(command);
     }
 
-    private void sendObject (Object obj) throws WebSocketException {
+    private void sendObject (Object obj) throws WebSocketFacadeException {
         System.out.println("send");
         try {
             this.session.getBasicRemote().sendText(new Gson().toJson(obj));
         } catch (IOException ex) {
-            throw new WebSocketException(500, ex.getMessage());
+            throw new WebSocketFacadeException(500, ex.getMessage());
         }
     }
 

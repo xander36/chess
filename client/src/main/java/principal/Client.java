@@ -122,7 +122,7 @@ public class Client {
             webSocketFacade.resign(authToken, game.gameID());
             status = "LOGGED_IN";
             return "imma resign";
-        } catch (WebSocketException e) {
+        } catch (WebSocketFacadeException e) {
             return "I didnt because " + e.toString();
         }
     }
@@ -135,7 +135,7 @@ public class Client {
             webSocketFacade.move(authToken, game.gameID(), move);
             status = "LOGGED_IN";
             return "imma resign";
-        } catch (WebSocketException e) {
+        } catch (WebSocketFacadeException e) {
             return "I didnt because " + e.toString();
         }
     }
@@ -145,7 +145,7 @@ public class Client {
             webSocketFacade.leaveGame(authToken, game.gameID());
             status = "LOGGED_IN";
             return "Left current game";
-        } catch (WebSocketException e) {
+        } catch (WebSocketFacadeException e) {
             return "I didnt because " + e.toString();
         }
     }
@@ -220,7 +220,7 @@ public class Client {
                 } else if (e.toString().contains("bad")){
                     return "No game with that ID, try again";
                 }
-            } catch (WebSocketException e){
+            } catch (WebSocketFacadeException e){
                 return "Websocket didn't work and its definitely Alex's fault";
             }
         }
