@@ -55,7 +55,8 @@ public class WebSocketHandler {
             case CONNECT:
                 connect(username, authToken, gameID, session);
                 break;
-            //case RESIGN -> resign(msg.getAuthToken(), msg.getGameID());
+            case RESIGN:
+                resign(username, gameID);
             //case LEAVE -> leave(msg.getAuthToken(), msg.getGameID());
             case MAKE_MOVE:
                 if (msg instanceof MakeMoveCommand moveMsg){
@@ -93,9 +94,6 @@ public class WebSocketHandler {
     }
 
     private void move(String username, int gameID, ChessMove move) throws IOException{
-        System.out.println("MOOOOOVEEE");
-        System.out.println(username);
-        System.out.println("Is going to do: " + move);
         try {
             var game = gameDAO.getGame(gameID);
             var board = game.game().getBoard();
@@ -130,9 +128,14 @@ public class WebSocketHandler {
                     connections.sendMessage(username, new ErrorMessage("It's currently " + whitePlayer + "'s turn"));
                     return;
                 }
+            } else {
+                connections.sendMessage(username, new ErrorMessage("You're not playing, silly"));
+                return;
             }
 
-            if(game.game().isInCheckmate(ChessGame.TeamColor.WHITE) || game.game().isInCheckmate(ChessGame.TeamColor.BLACK)) {
+            System.out.println(game.game().over);
+
+            if(game.game().over || game.game().isInCheckmate(ChessGame.TeamColor.WHITE) || game.game().isInCheckmate(ChessGame.TeamColor.BLACK)) {
                 connections.sendMessage(username, new ErrorMessage("The game is over. No further moves can be made"));
                 return;
             }
@@ -155,16 +158,11 @@ public class WebSocketHandler {
 
             gameDAO.updateGame(gameID, game);
 
-            System.out.println("sending a loadgame");
             connections.broadcastMessageToGame(null, gameID, new LoadGameMessage(game));
-            System.out.println("sending a notification");
+
             connections.broadcastMessageToGame(username, gameID, new NotificationMessage(username + " has moved: " + move));
 
 
-
-            System.out.println(game.game().getBoard().toString().replaceAll("&", "\n"));
-
-            System.out.println("sending an announcemtn");
             if (game.game().isInStalemate(ChessGame.TeamColor.WHITE) || game.game().isInStalemate(ChessGame.TeamColor.BLACK)) {
                 connections.broadcastToAll(null, new NotificationMessage(whitePlayer + " and " + blackPlayer + "have ended their game in a draw!"));
             } else if (game.game().isInCheckmate(ChessGame.TeamColor.BLACK)){
@@ -183,32 +181,39 @@ public class WebSocketHandler {
         }
     }
 
-    /*
-    private void enter(String visitorName, Session session) throws IOException {
-        connections.add(visitorName, session);
-        var message = String.format("%s is in the shop", visitorName);
-        var notification = new Notification(Notification.Type.ARRIVAL, message);
-        connections.broadcast(visitorName, notification);
-    }
-
-
-
-    private void exit(String visitorName) throws IOException {
-        connections.remove(visitorName);
-        var message = String.format("%s left the shop", visitorName);
-        var notification = new Notification(Notification.Type.DEPARTURE, message);
-        connections.broadcast(visitorName, notification);
-    }
-
-    public void makeNoise(String petName, String sound) throws WebSocketException {
+    private void resign(String username,int gameID) throws IOException{
         try {
-            var message = String.format("%s says %s", petName, sound);
-            var notification = new Notification(Notification.Type.NOISE, message);
-            connections.broadcast("", notification);
-        } catch (Exception ex) {
-            throw new WebSocketException(500, ex.getMessage());
+            var game = gameDAO.getGame(gameID);
+
+            System.out.println("Imma resign, is the game over?" + game.game().over);
+            if (game.game().over){
+                connections.sendMessage(username, new ErrorMessage("This game is already over, you can't resign"));
+                return;
+            }
+
+            String whitePlayer = game.whiteUsername();
+            String blackPlayer = game.blackUsername();
+
+            if (!username.equals(whitePlayer) && !username.equals(blackPlayer)){
+                connections.sendMessage(username, new ErrorMessage("You're not playing, silly, you can't resign"));
+                return;
+            }
+
+            game.game().over = true;
+            gameDAO.updateGame(gameID, game);
+
+            if (username.equals(whitePlayer)) {
+                connections.broadcastMessageToGame(null, gameID, new NotificationMessage(username +
+                        " has resigned their game against " + blackPlayer));
+            } else if (username.equals(blackPlayer)) {
+                connections.broadcastMessageToGame(null, gameID, new NotificationMessage(username +
+                        " has resigned their game against " + whitePlayer));
+            }
+
+
+        } catch (DataAccessException e) {
+            throw new RuntimeException(String.format("Lol some of the database blocks cracked and %s oozed out", e.toString()));
         }
     }
-    */
 
 }

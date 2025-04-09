@@ -12,6 +12,7 @@ import java.util.Objects;
  */
 public class ChessGame {
 
+    public boolean over = false;
     private TeamColor turn;
     private ChessBoard board;
 
@@ -22,12 +23,14 @@ public class ChessGame {
     }
 
     public ChessGame(String representString){
-        if (representString.startsWith("BLACK")){
+        String[] parts = representString.split("~");
+        if (parts[0].equals("BLACK")){
             this.turn = TeamColor.BLACK;
         }else{
             this.turn = TeamColor.WHITE;
         }
-        this.board = new ChessBoard(representString.substring(6));
+        this.board = new ChessBoard(parts[1]);
+        this.over = Boolean.parseBoolean(parts[2]);
     }
 
 
@@ -270,7 +273,7 @@ public class ChessGame {
 
     @Override
     public String toString() {
-        return turn + "&" + board;
+        return turn + "~" + board + "~" + over;
     }
 
     @Override
