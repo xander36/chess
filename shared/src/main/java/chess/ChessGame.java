@@ -1,5 +1,6 @@
 package chess;
 
+import java.time.Year;
 import java.util.Collection;
 import java.util.ArrayList;
 import java.util.Objects;
@@ -67,10 +68,13 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
+        System.out.println("Valid moves at "+ startPosition);
         ChessPiece piece = board.getPiece(startPosition);
+        System.out.println(piece);
+        System.out.println(board.toString().replaceAll("&", "\n"));
 
         if (piece == null){
-            return null;
+            return new ArrayList<ChessMove>();
         }
         Collection<ChessMove> moves = piece.pieceMoves(board, startPosition);
         Collection<ChessMove> validMoves = new ArrayList<>();

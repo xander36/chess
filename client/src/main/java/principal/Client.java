@@ -136,6 +136,9 @@ public class Client {
             return "Invalid move, try again";
         }
 
+        startPos = new ChessPosition(startPos.getRow(), 9-startPos.getColumn());
+        endPos = new ChessPosition(endPos.getRow(), 9-endPos.getColumn());
+
         ChessPiece.PieceType type = null;
         if (chessSyntax.length() == 5){
             switch (chessSyntax.charAt(4)){
@@ -361,13 +364,13 @@ public class Client {
         String letterRow;
         String[] numberColumn;
         if (team == ChessGame.TeamColor.BLACK){
-            letterRow = "    a  b  c  d  e  f  g  h    ";
-            numberColumn = new String[]{" 1 ", " 2 ", " 3 ", " 4 ", " 5 ", " 6 ", " 7 ", " 8 "};
-
-        } else if (team == ChessGame.TeamColor.WHITE){
             letterRow = "    h  g  f  e  d  c  b  a    ";
+            numberColumn = new String[]{" 1 ", " 2 ", " 3 ", " 4 ", " 5 ", " 6 ", " 7 ", " 8 "};
+        } else if (team == ChessGame.TeamColor.WHITE){
+            letterRow = "    a  b  c  d  e  f  g  h    ";
             numberColumn = new String[]{" 8 ", " 7 ", " 6 ", " 5 ", " 4 ", " 3 ", " 2 ", " 1 "};
         } else{return "C'mon son";}
+
 
         letterRow = SET_BG_COLOR_DARK_GREEN + SET_TEXT_COLOR_WHITE + letterRow;
         for (int i = 0; i < 8; i++){
