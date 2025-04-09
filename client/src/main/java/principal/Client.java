@@ -1,15 +1,11 @@
 package principal;
-
 import chess.*;
 import dataclasses.GameData;
 import facade.*;
 import request.*;
 import result.*;
-
 import java.util.ArrayList;
 import java.util.Collection;
-
-
 import static ui.EscapeSequences.*;
 
 public class Client {
@@ -20,11 +16,9 @@ public class Client {
     private GameData game = null;
     private ChessGame.TeamColor team = null;
     private ArrayList<GameData> recentGameListing = null;
-
     String url;
     private ServerFacade serverFacade;
     private WebSocketFacade webSocketFacade;
-
     private Repl repl;
 
     public Client(String url, Repl repl){
@@ -96,15 +90,11 @@ public class Client {
             String pos = parts[1];
 
             ChessPosition chessPos = labelPairToChessPos(pos);
-
             if (chessPos == null){
                 return "Invalid position";
             }
-
             Collection<ChessMove> moves = game.game().validMoves(chessPos);
-
             String out = "";
-
             ArrayList<ChessPosition> positions = new ArrayList<>();
             positions.add(chessPos);
 
@@ -112,11 +102,8 @@ public class Client {
                 positions.add(move.getEndPosition());
             }
 
-
-
             return getBoard(positions);
         }
-
     }
 
     private String doResign() {
@@ -131,9 +118,7 @@ public class Client {
 
     private String doMove(String input) {
         ChessMove move = null;
-
         String[] parts = input.split(" ");
-
         if (parts.length != 2){
             return "Invalid arguments";
         }
@@ -152,11 +137,8 @@ public class Client {
         }
 
         ChessPiece.PieceType type = null;
-
         if (chessSyntax.length() == 5){
-            char promoChar = chessSyntax.charAt(4);
-
-            switch (promoChar){
+            switch (chessSyntax.charAt(4)){
                 case 'Q' -> type = ChessPiece.PieceType.QUEEN;
                 case 'q' -> type = ChessPiece.PieceType.QUEEN;
                 case 'B' -> type = ChessPiece.PieceType.BISHOP;
@@ -169,10 +151,6 @@ public class Client {
         }
 
         move = new ChessMove(startPos, endPos, type);
-
-        if (move == null){
-            return "Invalid move, try again";
-        }
 
         try {
             webSocketFacade.move(authToken, game.gameID(), move);
@@ -218,9 +196,7 @@ public class Client {
                 return "No game with that ID";
             }
             team = ChessGame.TeamColor.WHITE;
-
             status = "OBSERVE";
-
             try {
                 webSocketFacade = new WebSocketFacade(url, repl);
                 webSocketFacade.connect(authToken, Integer.parseInt(parts[1]));
@@ -244,7 +220,6 @@ public class Client {
             } catch (NumberFormatException e){
                 return "Game ID is not a number... did you put the name instead?";
             }
-
             JoinGameRequest req = new JoinGameRequest(authToken, parts[2], gameID);
             try{
                 serverFacade.joinGame(req);
@@ -281,20 +256,16 @@ public class Client {
     private String doList() {
         ListRequest req = new ListRequest(authToken);
         ListResult res = serverFacade.listGames(req);
-
         recentGameListing = res.games();
 
         StringBuilder outMsg = new StringBuilder();
 
         outMsg.append("All current games:\n");
         for (GameData game : res.games()){
-
-
             int gameNum = game.gameID();
             String whitePlayer = game.whiteUsername();
             String blackPlayer = game.blackUsername();
             String gameName = game.gameName();
-
 
             outMsg.append(gameNum);
             outMsg.append("- ");
@@ -313,7 +284,6 @@ public class Client {
             }
             outMsg.append(" (BLACK)\n");
         }
-
         return outMsg.toString().trim();
     }
 
@@ -322,7 +292,6 @@ public class Client {
         if (parts.length != 2) {
             return "Invalid, please provide a name for the game to create";
         } else {
-
             MakeGameRequest req = new MakeGameRequest(authToken, parts[1]);
             MakeGameResult res = serverFacade.makeGame(req);
 
@@ -352,7 +321,6 @@ public class Client {
                 }
                 System.out.println(e.toString());
             }
-
         }
         return null;
     }
@@ -377,7 +345,6 @@ public class Client {
                     return "That username is taken, try another";
                 }
             }
-
         }
         return null;
     }
@@ -400,15 +367,12 @@ public class Client {
         } else if (team == ChessGame.TeamColor.WHITE){
             letterRow = "    h  g  f  e  d  c  b  a    ";
             numberColumn = new String[]{" 8 ", " 7 ", " 6 ", " 5 ", " 4 ", " 3 ", " 2 ", " 1 "};
-        } else{
-            return "C'mon son";
-        }
+        } else{return "C'mon son";}
 
         letterRow = SET_BG_COLOR_DARK_GREEN + SET_TEXT_COLOR_WHITE + letterRow;
         for (int i = 0; i < 8; i++){
             numberColumn[i] = SET_BG_COLOR_DARK_GREEN + SET_TEXT_COLOR_WHITE + numberColumn[i];
         }
-
 
         fancyString.append(letterRow + RESET_BG_COLOR + "\n");
 
@@ -417,22 +381,17 @@ public class Client {
         for (int i = 1; i < 9; i++){
             fancyString.append(numberColumn[i-1]);
             for (int j = 1; j < 9; j++){
-
-
-
                 if (team == ChessGame.TeamColor.WHITE){
                     i = 9-i;
                     j = 9-j;
                 }
 
                 boolean highlightHere = false;
-
                 for (ChessPosition pos: positions){
                     if (pos.getRow() == i && pos.getColumn() == j){
                         highlightHere = true;
                     }
                 }
-
                 if ((i+j) % 2 == 0){
                     if (highlightHere){
                         fancyString.append(SET_BG_COLOR_YELLOW);
@@ -456,9 +415,7 @@ public class Client {
                         fancyString.append(SET_TEXT_COLOR_BLUE);
                     }
                     fancyString.append(" " + piece.toString() + " ");
-
                 }
-
                 if (team == ChessGame.TeamColor.WHITE){
                     i = 9-i;
                     j = 9-j;
@@ -467,14 +424,11 @@ public class Client {
             fancyString.append(numberColumn[i-1] + RESET_BG_COLOR + "\n");
         }
         fancyString.append(letterRow + RESET_BG_COLOR);
-
         return fancyString.toString();
     }
 
     private GameData getGameWithID(int id){
-
         for (GameData game : recentGameListing){
-
             if (game.gameID() == id){
                 return game;
             }
@@ -510,7 +464,6 @@ public class Client {
         this.game = game;
     }
 
-
     public String boardString(){
         return getBoard();
     }
@@ -519,7 +472,6 @@ public class Client {
         if (pos.length() != 2){
             return null;
         }
-
         int col = Character.toLowerCase(pos.charAt(0)) + 1 - 'a';
         int row = -1;
         try{
@@ -527,13 +479,10 @@ public class Client {
         } catch (Exception e){
             return null;
         }
-
         if (row < 1 || row > 8 || col < 1 || col > 8){
             return null;
         }
-
         ChessPosition chessPos = new ChessPosition(row, col);
         return chessPos;
-
     }
 }
