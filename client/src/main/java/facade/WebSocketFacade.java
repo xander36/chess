@@ -5,7 +5,7 @@ import chess.ChessMove;
 import com.google.gson.Gson;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
-import websocket.messages.Notification;
+import websocket.messages.*;
 
 import javax.websocket.*;
 import java.io.IOException;
@@ -31,9 +31,16 @@ public class WebSocketFacade extends Endpoint {
             this.session.addMessageHandler(new MessageHandler.Whole<String>() {
                 @Override
                 public void onMessage(String message) {
-                    System.out.println("avst, it be arriving on cliently shores");
-                    Notification notification = new Gson().fromJson(message, Notification.class);
-                    notificationHandler.notify(notification);
+                    ServerMessage msg  = new Gson().fromJson(message, ServerMessage.class);
+
+                    if (msg.getServerMessageType() == ServerMessage.ServerMessageType.NOTIFICATION){
+                        notificationHandler.notify(new Gson().fromJson(message, NotificationMessage.class));
+                    } else if (msg.getServerMessageType() == ServerMessage.ServerMessageType.ERROR) {
+                        notificationHandler.notify(new Gson().fromJson(message, ErrorMessage.class));
+                    } else if (msg.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
+                        notificationHandler.notify(new Gson().fromJson(message, LoadGameMessage.class));
+                    }
+
                 }
             });
         } catch (DeploymentException | IOException | URISyntaxException ex) {
@@ -66,7 +73,6 @@ public class WebSocketFacade extends Endpoint {
     }
 
     private void sendObject (Object obj) throws WebSocketFacadeException {
-        System.out.println("send");
         try {
             this.session.getBasicRemote().sendText(new Gson().toJson(obj));
         } catch (IOException ex) {

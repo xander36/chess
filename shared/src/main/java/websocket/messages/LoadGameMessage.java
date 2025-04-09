@@ -4,7 +4,7 @@ import chess.ChessGame;
 import dataclasses.GameData;
 
 public class LoadGameMessage extends ServerMessage{
-    private GameData game;
+    public GameData game;
 
     public LoadGameMessage(GameData game){
         super(ServerMessageType.LOAD_GAME);

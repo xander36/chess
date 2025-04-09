@@ -98,6 +98,8 @@ public class WebSocketHandler {
     }
 
     private void move(String username, int gameID, ChessMove move) throws IOException{
+        System.out.println(move);
+
         try {
             var game = gameDAO.getGame(gameID);
             var board = game.game().getBoard();
@@ -137,16 +139,10 @@ public class WebSocketHandler {
                 return;
             }
 
-            System.out.println(game.game().over);
-
             if(game.game().over || game.game().isInCheckmate(ChessGame.TeamColor.WHITE) || game.game().isInCheckmate(ChessGame.TeamColor.BLACK)) {
                 connections.sendMessage(username, new ErrorMessage("The game is over. No further moves can be made"));
                 return;
             }
-
-
-
-
 
             board.addPiece(move.getStartPosition(), null);
 
@@ -164,7 +160,7 @@ public class WebSocketHandler {
 
             connections.broadcastMessageToGame(null, gameID, new LoadGameMessage(game));
 
-            connections.broadcastMessageToGame(username, gameID, new NotificationMessage(username + " has moved: " + move));
+            connections.broadcastMessageToGame(username, gameID, new NotificationMessage(username + " made their move"));
 
 
             if (game.game().isInStalemate(ChessGame.TeamColor.WHITE) || game.game().isInStalemate(ChessGame.TeamColor.BLACK)) {
@@ -220,7 +216,6 @@ public class WebSocketHandler {
     }
 
     private void leave(String username,int gameID) throws IOException{
-        System.out.println(username + " leaving");
         try {
             var game = gameDAO.getGame(gameID);
 

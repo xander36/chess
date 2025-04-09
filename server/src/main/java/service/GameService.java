@@ -55,13 +55,13 @@ public class GameService {
             }
 
             if (joinGameRequest.playerColor().equals("WHITE")) {
-                if (game.whiteUsername() == null) {
+                if (game.whiteUsername() == null || game.whiteUsername().equals(username)) {
                     newGame = new GameData(gameID, username, game.blackUsername(), game.gameName(), game.game());
                 } else {
                     throw new ChessMatchException("white user spot taken");
                 }
             } else if (joinGameRequest.playerColor().equals("BLACK")) {
-                if (game.blackUsername() == null) {
+                if (game.blackUsername() == null || game.blackUsername().equals(username)) {
                     newGame = new GameData(gameID, game.whiteUsername(), username, game.gameName(), game.game());
                 } else {
                     throw new ChessMatchException("black user spot taken");

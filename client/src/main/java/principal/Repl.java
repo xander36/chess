@@ -6,7 +6,8 @@ import facade.NotificationHandler;
 
 import java.util.Scanner;
 
-import websocket.messages.Notification;
+import websocket.messages.*;
+
 
 public class Repl implements NotificationHandler {
 
@@ -28,15 +29,48 @@ public class Repl implements NotificationHandler {
         while (!result.startsWith("Session over")){
             result = client.eval(scan.nextLine());
             System.out.println(result);
-            System.out.print(client.getPrompt());
+            if (!result.trim().isEmpty()) {
+                System.out.print(client.getPrompt());
+            }
         }
 
         System.out.println();
     }
 
-    public void notify(Notification notification) {
-        System.out.println(notification.message());
+    public void notify(ServerMessage notification) {
+        if (notification instanceof NotificationMessage){
+            notNotify((NotificationMessage) notification);
+        } else if (notification instanceof ErrorMessage) {
+            errNotify((ErrorMessage) notification);
+        } else if (notification instanceof LoadGameMessage) {
+            loadNotify((LoadGameMessage) notification);
+        }else{
+            System.out.println("recieved an ambiguous message");
+            System.out.print(client.getPrompt());
+        }
+    }
+
+    public void notNotify(NotificationMessage not){
+        System.out.println();
+        System.out.println("NOTICE: " + not.message);
         System.out.print(client.getPrompt());
     }
+
+    public void errNotify(ErrorMessage err){
+        System.out.println();
+        System.out.println("Error: " + err.errorMessage);
+        System.out.print(client.getPrompt());
+
+    }
+
+    public void loadNotify(LoadGameMessage load){
+        System.out.println();
+        System.out.println("Current Board:");
+        client.setGame(load.game);
+        System.out.println(client.boardString());
+        System.out.print(client.getPrompt());
+    }
+
+
 
 }

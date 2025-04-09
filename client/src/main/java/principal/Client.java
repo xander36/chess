@@ -30,6 +30,7 @@ public class Client {
     public Client(String url, Repl repl){
         serverFacade  = new ServerFacade(url);
         this.repl = repl;
+        this.url = url;
     }
 
     public String eval(String inString){
@@ -71,6 +72,14 @@ public class Client {
                 } else if (input.startsWith("show")) {
                     return doShowMoves(input);
                 }
+            } else if (status.equals("OBSERVE")) {
+                if (input.startsWith("redraw")) {
+                    return doRedraw();
+                } else if (input.startsWith("leave")) {
+                    return doLeave();
+                } else if (input.startsWith("show")) {
+                    return doShowMoves(input);
+                }
             }
         }
         return "Unknown command - check your spelling!";
@@ -86,18 +95,11 @@ public class Client {
         } else{
             String pos = parts[1];
 
-            if (pos.length() != 2){
+            ChessPosition chessPos = labelPairToChessPos(pos);
+
+            if (chessPos == null){
                 return "Invalid position";
             }
-
-            int col = Character.toLowerCase(pos.charAt(0)) + 1 - 'a';
-            int row = Integer.parseInt(pos.charAt(1)+"");
-
-            if (row < 1 || row > 8 || col < 1 || col > 8){
-                return "Invalid position";
-            }
-
-            ChessPosition chessPos = new ChessPosition(row, col);
 
             Collection<ChessMove> moves = game.game().validMoves(chessPos);
 
@@ -121,7 +123,7 @@ public class Client {
         try {
             webSocketFacade.resign(authToken, game.gameID());
             status = "LOGGED_IN";
-            return "imma resign";
+            return "";
         } catch (WebSocketFacadeException e) {
             return "I didnt because " + e.toString();
         }
@@ -130,11 +132,51 @@ public class Client {
     private String doMove(String input) {
         ChessMove move = null;
 
-        try {
+        String[] parts = input.split(" ");
 
+        if (parts.length != 2){
+            return "Invalid arguments";
+        }
+
+        String chessSyntax = parts[1];
+
+        if (chessSyntax.length() < 4){
+            return "Invalid move, check your formatting";
+        }
+
+        ChessPosition startPos = labelPairToChessPos(chessSyntax.substring(0, 2));
+        ChessPosition endPos = labelPairToChessPos(chessSyntax.substring(2,4));
+
+        if (startPos == null || endPos == null){
+            return "Invalid move, try again";
+        }
+
+        ChessPiece.PieceType type = null;
+
+        if (chessSyntax.length() == 5){
+            char promoChar = chessSyntax.charAt(4);
+
+            switch (promoChar){
+                case 'Q' -> type = ChessPiece.PieceType.QUEEN;
+                case 'q' -> type = ChessPiece.PieceType.QUEEN;
+                case 'B' -> type = ChessPiece.PieceType.BISHOP;
+                case 'b' -> type = ChessPiece.PieceType.BISHOP;
+                case 'R' -> type = ChessPiece.PieceType.ROOK;
+                case 'r' -> type = ChessPiece.PieceType.ROOK;
+                case 'N' -> type = ChessPiece.PieceType.KNIGHT;
+                case 'n' -> type = ChessPiece.PieceType.KNIGHT;
+            }
+        }
+
+        move = new ChessMove(startPos, endPos, type);
+
+        if (move == null){
+            return "Invalid move, try again";
+        }
+
+        try {
             webSocketFacade.move(authToken, game.gameID(), move);
-            status = "LOGGED_IN";
-            return "imma resign";
+            return "";
         } catch (WebSocketFacadeException e) {
             return "I didnt because " + e.toString();
         }
@@ -176,7 +218,16 @@ public class Client {
                 return "No game with that ID";
             }
             team = ChessGame.TeamColor.WHITE;
-            return "Lets observe game #" + parts[1] + "\n" + getBoard();
+
+            status = "OBSERVE";
+
+            try {
+                webSocketFacade = new WebSocketFacade(url, repl);
+                webSocketFacade.connect(authToken, Integer.parseInt(parts[1]));
+            } catch (WebSocketFacadeException e){
+                return "Websocket didn't work and its definitely Alex's fault";
+            }
+            return "";
         }
     }
 
@@ -212,7 +263,7 @@ public class Client {
                 webSocketFacade = new WebSocketFacade(url, repl);
                 webSocketFacade.connect(authToken, gameID);
 
-                return "User " + username + " has joined game #" + game.gameID() + " as the " + parts[2] + " player" + "\n" + getBoard();
+                return "User " + username + " has joined game #" + game.gameID() + " as the " + parts[2] + " player";
 
             } catch (ServerFacadeException e) {
                 if (e.toString().contains("taken")){
@@ -342,11 +393,11 @@ public class Client {
         StringBuilder fancyString = new StringBuilder();
         String letterRow;
         String[] numberColumn;
-        if (team == ChessGame.TeamColor.WHITE){
+        if (team == ChessGame.TeamColor.BLACK){
             letterRow = "    a  b  c  d  e  f  g  h    ";
             numberColumn = new String[]{" 1 ", " 2 ", " 3 ", " 4 ", " 5 ", " 6 ", " 7 ", " 8 "};
 
-        } else if (team == ChessGame.TeamColor.BLACK){
+        } else if (team == ChessGame.TeamColor.WHITE){
             letterRow = "    h  g  f  e  d  c  b  a    ";
             numberColumn = new String[]{" 8 ", " 7 ", " 6 ", " 5 ", " 4 ", " 3 ", " 2 ", " 1 "};
         } else{
@@ -369,7 +420,7 @@ public class Client {
 
 
 
-                if (team == ChessGame.TeamColor.BLACK){
+                if (team == ChessGame.TeamColor.WHITE){
                     i = 9-i;
                     j = 9-j;
                 }
@@ -408,7 +459,7 @@ public class Client {
 
                 }
 
-                if (team == ChessGame.TeamColor.BLACK){
+                if (team == ChessGame.TeamColor.WHITE){
                     i = 9-i;
                     j = 9-j;
                 }
@@ -438,6 +489,8 @@ public class Client {
             return "Valid commands:\n\tcreate <name>\n\tlist\n\tjoin <ID#> <team>\n\tobserve <ID#>\n\tlogout\n\tquit\n\thelp";
         }else if (status.equals("PLAY")){
             return "Valid commands:\n\tshow <position>\n\tmove <MOVE>\n\tredraw\n\tresign\n\tleave\n\thelp";
+        }else if (status.equals("OBSERVE")){
+            return "Valid commands:\n\tshow <position>\n\tredraw\n\tleave\n\thelp";
         }
         return "You broke the FSM, there can be no help for you";
     }
@@ -451,5 +504,36 @@ public class Client {
 
         prompt += "] >>> ";
         return prompt;
+    }
+
+    public void setGame(GameData game){
+        this.game = game;
+    }
+
+
+    public String boardString(){
+        return getBoard();
+    }
+
+    private ChessPosition labelPairToChessPos(String pos){
+        if (pos.length() != 2){
+            return null;
+        }
+
+        int col = Character.toLowerCase(pos.charAt(0)) + 1 - 'a';
+        int row = -1;
+        try{
+            row = Integer.parseInt(pos.charAt(1)+"");
+        } catch (Exception e){
+            return null;
+        }
+
+        if (row < 1 || row > 8 || col < 1 || col > 8){
+            return null;
+        }
+
+        ChessPosition chessPos = new ChessPosition(row, col);
+        return chessPos;
+
     }
 }
