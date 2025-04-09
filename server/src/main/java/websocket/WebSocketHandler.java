@@ -69,7 +69,7 @@ public class WebSocketHandler {
                 System.out.println(msg);
                 if (msg instanceof MakeMoveCommand moveMsg){
                     System.out.println("cast works");
-                    move(username, moveMsg.move);
+                    move(username, gameID, moveMsg.move);
                 }
                 break;
             default: connections.sendMessage(username, new NotificationMessage("Error: bad command"));
@@ -107,8 +107,22 @@ public class WebSocketHandler {
         }
     }
 
-    private void move(String username, ChessMove move){
-        System.out.println("unimplemtned move logic");
+    private void move(String username, int gameID, ChessMove move){
+        try {
+            var game = gameDAO.getGame(gameID);
+            var board = game.game().getBoard();
+            var piece = board.getPiece(move.getStartPosition());
+
+
+            board.addPiece(move.getStartPosition(), null);
+            board.addPiece(move.getEndPosition(), piece);
+
+            game.game().setBoard(board);
+            gameDAO.updateGame(gameID, game);
+
+        } catch (DataAccessException e){
+            throw new RuntimeException(String.format("Lol some of the database blocks cracked and %s oozed out", e.toString()));
+        }
     }
 
     /*
