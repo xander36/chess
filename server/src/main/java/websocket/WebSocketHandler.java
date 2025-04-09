@@ -3,6 +3,7 @@ package websocket;
 import chess.ChessGame;
 import chess.ChessMove;
 import com.google.gson.Gson;
+import dataclasses.GameData;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
 
@@ -57,7 +58,10 @@ public class WebSocketHandler {
                 break;
             case RESIGN:
                 resign(username, gameID);
-            //case LEAVE -> leave(msg.getAuthToken(), msg.getGameID());
+                break;
+            case LEAVE:
+                leave(username, gameID);
+                break;
             case MAKE_MOVE:
                 if (msg instanceof MakeMoveCommand moveMsg){
                     move(username, gameID, moveMsg.move);
@@ -185,7 +189,6 @@ public class WebSocketHandler {
         try {
             var game = gameDAO.getGame(gameID);
 
-            System.out.println("Imma resign, is the game over?" + game.game().over);
             if (game.game().over){
                 connections.sendMessage(username, new ErrorMessage("This game is already over, you can't resign"));
                 return;
@@ -209,6 +212,35 @@ public class WebSocketHandler {
                 connections.broadcastMessageToGame(null, gameID, new NotificationMessage(username +
                         " has resigned their game against " + whitePlayer));
             }
+
+
+        } catch (DataAccessException e) {
+            throw new RuntimeException(String.format("Lol some of the database blocks cracked and %s oozed out", e.toString()));
+        }
+    }
+
+    private void leave(String username,int gameID) throws IOException{
+        System.out.println(username + " leaving");
+        try {
+            var game = gameDAO.getGame(gameID);
+
+            String whitePlayer = game.whiteUsername();
+            String blackPlayer = game.blackUsername();
+
+
+
+            if (username.equals(whitePlayer)) {
+                game = new GameData(gameID, null, blackPlayer, game.gameName(), game.game());
+            } else if (username.equals(blackPlayer)) {
+                game = new GameData(gameID, whitePlayer,null, game.gameName(), game.game());
+            }
+
+            connections.broadcastMessageToGame(username, gameID, new NotificationMessage(username +
+                    " has left the game"));
+
+            connections.remove(username);
+
+            gameDAO.updateGame(gameID, game);
 
 
         } catch (DataAccessException e) {

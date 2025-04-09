@@ -18,4 +18,13 @@ public class Connection {
     public void send(String msg) throws IOException {
         session.getRemote().sendString(msg);
     }
+
+    @Override
+    public String toString() {
+        return "Connection{" +
+                "username='" + username + '\'' +
+                ", gameID=" + gameID +
+                ", session=" + session +
+                '}';
+    }
 }

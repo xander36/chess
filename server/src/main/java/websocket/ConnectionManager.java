@@ -21,8 +21,8 @@ public class ConnectionManager {
         connections.put(username, connection);
     }
 
-    public void remove(String authToken) {
-        connections.remove(authToken);
+    public void remove(String username) {
+        connections.remove(username);
     }
 
     public void sendMessage(String sendUsername, ServerMessage msg) throws IOException{
@@ -38,10 +38,12 @@ public class ConnectionManager {
     public void broadcastMessageToGame(String exceptUsername, int gameID, ServerMessage msg) throws IOException{
         var removeList = new ArrayList<Connection>();
         for (var c : connections.values()) {
+            System.out.println(c.toString());
             if (c.session.isOpen()) {
                 if (!c.username.equals(exceptUsername)) {
                     if (c.gameID == gameID){
-                            c.send(gson.toJson(msg));
+                        System.out.println("yup send it");
+                        c.send(gson.toJson(msg));
                     }
                 }
             } else {

@@ -172,7 +172,7 @@ public class ServerFacadeTests {
 
             Assertions.assertEquals("[GameData[gameID=1, whiteUsername=null, " +
                     "blackUsername=null, gameName=chess2, " +
-                    "game=WHITE&RNBQKBNR&PPPPPPPP&********&********&********&********&pppppppp&rnbqkbnr&]]", result.games().toString());
+                    "game=WHITE~RNBQKBNR&PPPPPPPP&********&********&********&********&pppppppp&rnbqkbnr&~false]]", result.games().toString());
 
         } catch (Exception e){
             System.out.println(e.toString());
