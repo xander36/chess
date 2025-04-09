@@ -13,8 +13,6 @@ import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import websocket.messages.*;
 
 import java.io.IOException;
-import java.util.Timer;
-
 
 
 @WebSocket
@@ -78,7 +76,7 @@ public class WebSocketHandler {
 
     private void connect(String username, String authToken, int gameID, Session sesh) throws IOException{
         System.out.println("connection");
-        connections.add(username, sesh);
+        connections.add(username, gameID, sesh);
 
         try {
             //Verify that these two exist
@@ -88,7 +86,7 @@ public class WebSocketHandler {
             System.out.println(auth);
 
             var message = "";
-            ServerMessage notification = new LoadGameMessage(gameID);
+            ServerMessage notification = new LoadGameMessage(game);
             connections.sendMessage(username, notification);
             notification = new NotificationMessage(username + " joined the game!");
             connections.broadcastMessageToGame(username, gameID, notification);
@@ -107,11 +105,30 @@ public class WebSocketHandler {
         }
     }
 
-    private void move(String username, int gameID, ChessMove move){
+    private void move(String username, int gameID, ChessMove move) throws IOException{
         try {
             var game = gameDAO.getGame(gameID);
             var board = game.game().getBoard();
             var piece = board.getPiece(move.getStartPosition());
+
+            String whitePlayer = game.whiteUsername();
+            String blackPlayer = game.blackUsername();
+
+
+
+            if (username.equals(blackPlayer)){
+                System.out.println("playing black");
+                if(game.game().isInCheckmate(ChessGame.TeamColor.BLACK)) {
+                    connections.sendMessage(username, new ErrorMessage("The game is over. No further moves can be made"));
+                    return;
+                }
+            } else if (username.equals(whitePlayer)){
+                System.out.println("playing white");
+                if(game.game().isInCheckmate(ChessGame.TeamColor.WHITE)) {
+                    connections.sendMessage(username, new ErrorMessage("The game is over. No further moves can be made"));
+                    return;
+                }
+            }
 
 
             board.addPiece(move.getStartPosition(), null);
@@ -119,6 +136,29 @@ public class WebSocketHandler {
 
             game.game().setBoard(board);
             gameDAO.updateGame(gameID, game);
+
+            System.out.println("sending a loadgame");
+            connections.broadcastMessageToGame(null, gameID, new LoadGameMessage(game));
+            System.out.println("sending a notification");
+            connections.broadcastMessageToGame(username, gameID, new NotificationMessage(username + " has moved: " + move));
+
+
+
+            System.out.println(game.game().getBoard().toString().replaceAll("&", "\n"));
+
+            System.out.println("sending an announcemtn");
+            if (game.game().isInStalemate(ChessGame.TeamColor.WHITE) || game.game().isInStalemate(ChessGame.TeamColor.BLACK)) {
+                connections.broadcastToAll(null, new NotificationMessage(whitePlayer + " and " + blackPlayer + "have ended their game in a draw!"));
+            } else if (game.game().isInCheckmate(ChessGame.TeamColor.BLACK)){
+                connections.broadcastToAll(null, new NotificationMessage(whitePlayer + " has checkmated " + blackPlayer + "!"));
+            } else if (game.game().isInCheckmate(ChessGame.TeamColor.WHITE)){
+                connections.broadcastToAll(null, new NotificationMessage(blackPlayer + " has checkmated " + whitePlayer + "!"));
+            } else if (game.game().isInCheck(ChessGame.TeamColor.BLACK)){
+                connections.broadcastToAll(blackPlayer, new NotificationMessage(whitePlayer + " has checked " + blackPlayer + "!"));
+            } else if (game.game().isInCheck(ChessGame.TeamColor.WHITE)){
+                connections.broadcastToAll(whitePlayer, new NotificationMessage(blackPlayer + " has checked " + whitePlayer + "!"));
+            }
+
 
         } catch (DataAccessException e){
             throw new RuntimeException(String.format("Lol some of the database blocks cracked and %s oozed out", e.toString()));
