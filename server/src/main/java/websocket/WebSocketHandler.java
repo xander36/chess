@@ -110,12 +110,26 @@ public class WebSocketHandler {
             String whitePlayer = game.whiteUsername();
             String blackPlayer = game.blackUsername();
 
-            if (username.equals(whitePlayer) && piece.getTeamColor() == ChessGame.TeamColor.BLACK){
-                connections.sendMessage(username, new ErrorMessage("That is a move for the other team"));
-                return;
-            } else if (username.equals(blackPlayer) && piece.getTeamColor() == ChessGame.TeamColor.WHITE){
-                connections.sendMessage(username, new ErrorMessage("That is a move for the other team"));
-                return;
+            if (username.equals(whitePlayer)){
+                if (piece.getTeamColor() == ChessGame.TeamColor.BLACK){
+                    connections.sendMessage(username, new ErrorMessage("That is a move for the other team"));
+                    return;
+                }
+
+                if (game.game().getTeamTurn() == ChessGame.TeamColor.BLACK){
+                    connections.sendMessage(username, new ErrorMessage("It's currently " + blackPlayer + "'s turn"));
+                    return;
+                }
+            } else if (username.equals(blackPlayer)){
+                if (piece.getTeamColor() == ChessGame.TeamColor.WHITE){
+                    connections.sendMessage(username, new ErrorMessage("That is a move for the other team"));
+                    return;
+                }
+
+                if (game.game().getTeamTurn() == ChessGame.TeamColor.WHITE){
+                    connections.sendMessage(username, new ErrorMessage("It's currently " + whitePlayer + "'s turn"));
+                    return;
+                }
             }
 
             if(game.game().isInCheckmate(ChessGame.TeamColor.WHITE) || game.game().isInCheckmate(ChessGame.TeamColor.BLACK)) {
@@ -133,6 +147,12 @@ public class WebSocketHandler {
 
 
             game.game().setBoard(board);
+            if (game.game().getTeamTurn() == ChessGame.TeamColor.WHITE){
+                game.game().setTeamTurn(ChessGame.TeamColor.BLACK);
+            } else if (game.game().getTeamTurn() == ChessGame.TeamColor.BLACK){
+                game.game().setTeamTurn(ChessGame.TeamColor.WHITE);
+            }
+
             gameDAO.updateGame(gameID, game);
 
             System.out.println("sending a loadgame");
